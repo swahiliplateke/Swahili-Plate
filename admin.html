@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swahili Plate | Orders</title>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#123c4a; --ocean:#17677a; --clay:#b95032; --gold:#d9902b; --cream:#fffaf2; --sand:#f7f0e5; --line:#e7dac8; --muted:#60767b; --green:#28654d; --red:#963c25; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-width:320px; color:var(--ink); background:#f6f2eb; font-family:"DM Sans",sans-serif; }
+    button, input, select, textarea { font:inherit; }
+    button { cursor:pointer; }
+    .display { font-family:Fraunces,serif; }
+    .shell { display:grid; grid-template-columns:240px minmax(0,1fr); min-height:100vh; }
+    .sidebar { padding:28px 18px; color:#fff; background:var(--ink); }
+    .brand { padding:0 12px 28px; border-bottom:1px solid rgba(255,255,255,.16); }
+    .brand-name { font:700 25px Fraunces,serif; }
+    .brand-kicker { margin-top:5px; color:#f4bf62; font-size:10px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; }
+    .side-nav { margin-top:24px; display:grid; gap:6px; }
+    .side-nav button { display:flex; align-items:center; gap:11px; width:100%; padding:12px; border:0; border-radius:10px; color:#d8e7e8; background:transparent; text-align:left; }
+    .side-nav button.active, .side-nav button:hover { color:#fff; background:#17677a; }
+    .side-foot { position:fixed; bottom:24px; width:190px; color:#b9cacc; font-size:12px; line-height:1.6; }
+    .main { min-width:0; padding:28px clamp(18px,4vw,46px) 48px; }
+    .topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:28px; }
+    .eyebrow { margin:0 0 7px; color:var(--clay); font-size:12px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; }
+    h1 { margin:0; font:700 clamp(28px,3vw,42px) Fraunces,serif; }
+    .subtle { color:var(--muted); }
+    .sync { display:flex; align-items:center; gap:8px; padding:9px 12px; border:1px solid var(--line); border-radius:999px; background:#fffaf2; color:var(--muted); font-size:12px; white-space:nowrap; }
+    .dot { width:8px; height:8px; border-radius:50%; background:#d9902b; }
+    .dot.live { background:#3b9a6e; }
+    .stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:24px; }
+    .stat, .panel { border:1px solid var(--line); border-radius:16px; background:#fffdf9; box-shadow:0 5px 18px rgba(18,60,74,.04); }
+    .stat { padding:18px; }
+    .stat-top { display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
+    .stat-icon { display:grid; place-items:center; width:30px; height:30px; border-radius:9px; color:var(--ocean); background:#e6f1ef; }
+    .stat-value { margin-top:13px; font:700 28px Fraunces,serif; }
+    .workspace { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr); gap:20px; align-items:start; }
+    .panel-head { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:20px 20px 16px; border-bottom:1px solid var(--line); }
+    .panel-head h2 { margin:0; font:700 22px Fraunces,serif; }
+    .filters { display:flex; gap:9px; padding:15px 20px; border-bottom:1px solid var(--line); }
+    .field { min-width:0; width:100%; padding:10px 12px; border:1px solid #cfd8d3; border-radius:9px; color:var(--ink); background:#fff; outline:none; }
+    .field:focus { border-color:var(--ocean); box-shadow:0 0 0 3px rgba(23,103,122,.12); }
+    .orders { display:grid; }
+    .order-row { display:grid; grid-template-columns:minmax(150px,1.15fr) minmax(110px,.7fr) minmax(100px,.65fr) auto; gap:14px; align-items:center; padding:17px 20px; border-bottom:1px solid #eee5d9; transition:background .2s; }
+    .order-row:hover, .order-row.selected { background:#f8f1e6; }
+    .order-row:last-child { border-bottom:0; }
+    .order-id { color:var(--clay); font-size:12px; font-weight:700; }
+    .customer { margin-top:4px; font-weight:700; }
+    .order-meta { margin-top:4px; color:var(--muted); font-size:12px; }
+    .status { display:inline-flex; align-items:center; width:max-content; padding:5px 9px; border-radius:999px; font-size:11px; font-weight:700; }
+    .status.new { color:#8b5c00; background:#fff0d8; }
+    .status.confirmed, .status.ready { color:var(--green); background:#e3f0e9; }
+    .status.preparing { color:var(--ocean); background:#e6f1ef; }
+    .status.out { color:#6b4c91; background:#eee8f6; }
+    .status.completed { color:#4e6267; background:#e8eeee; }
+    .status.cancelled { color:#9b3e28; background:#fae4dc; }
+    .row-total { text-align:right; font-weight:700; white-space:nowrap; }
+    .empty { padding:48px 20px; color:var(--muted); text-align:center; }
+    .detail { position:sticky; top:24px; overflow:hidden; }
+    .detail-body { padding:20px; }
+    .detail-empty { padding:48px 14px; color:var(--muted); text-align:center; }
+    .detail-title { display:flex; justify-content:space-between; gap:12px; align-items:start; }
+    .detail-title h3 { margin:0; font:700 25px Fraunces,serif; }
+    .detail-section { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); }
+    .detail-section h4 { margin:0 0 12px; color:var(--muted); font-size:11px; letter-spacing:.13em; text-transform:uppercase; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .info-label { color:var(--muted); font-size:11px; }
+    .info-value { margin-top:3px; font-size:14px; font-weight:600; overflow-wrap:anywhere; }
+    .info-value a { color:var(--ocean); }
+    .items { display:grid; gap:8px; }
+    .item { display:flex; justify-content:space-between; gap:12px; font-size:13px; }
+    .item span:last-child { font-weight:700; white-space:nowrap; }
+    .notice { padding:13px; border-radius:10px; color:#7a4b13; background:#fff0d8; font-size:13px; line-height:1.5; }
+    .notice.delivery { color:#17677a; background:#e6f1ef; }
+    .action-grid { display:grid; gap:10px; }
+    .action-row { display:flex; gap:9px; }
+    .action-row .field { flex:1; }
+    .primary, .secondary { min-height:42px; border:0; border-radius:9px; padding:0 14px; font-weight:700; }
+    .primary { color:#fff; background:var(--clay); }
+    .primary:hover { background:#963c25; }
+    .secondary { color:var(--ink); border:1px solid #cfd8d3; background:#fff; }
+    .menu-panel { padding:20px; }
+    .menu-editor { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; padding:18px; border-bottom:1px solid var(--line); background:#f8f1e6; }
+    .menu-editor .full { grid-column:1 / -1; }
+    .menu-actions { display:flex; flex-wrap:wrap; gap:9px; grid-column:1 / -1; }
+    .menu-list { display:grid; }
+    .menu-item { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(100px,.6fr) auto; gap:14px; align-items:center; padding:15px 0; border-bottom:1px solid #eee5d9; }
+    .menu-item:last-child { border-bottom:0; }
+    .menu-item-name { font-weight:700; }
+    .menu-item-meta { margin-top:4px; color:var(--muted); font-size:12px; }
+    .menu-item-actions { display:flex; justify-content:flex-end; gap:7px; }
+    .danger { color:#963c25; border-color:#e6b9aa; }
+    .menu-empty { padding:35px 10px; color:var(--muted); text-align:center; }
+    .branch-panel { padding:20px; }
+    .branch-form { display:grid; gap:18px; }
+    .branch-section { padding:18px 0; border-bottom:1px solid var(--line); }
+    .branch-section:first-child { padding-top:0; }
+    .branch-section:last-child { border-bottom:0; }
+    .branch-section h3 { margin:0 0 13px; font:700 20px Fraunces,serif; }
+    .branch-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .branch-grid .full { grid-column:1 / -1; }
+    .branch-days { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+    .day-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:center; }
+    .image-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-top:12px; }
+    .image-item { overflow:hidden; border:1px solid var(--line); border-radius:10px; background:#fff; }
+    .image-item img { display:block; width:100%; height:95px; object-fit:cover; }
+    .image-item button { width:100%; border:0; padding:8px; color:var(--red); background:#fff; font-weight:700; }
+    .traffic-note { padding:12px; border-radius:10px; color:#17677a; background:#e6f1ef; font-size:13px; line-height:1.5; }
+    .delivery-list { display:grid; gap:14px; }
+    .delivery-card { padding:20px; border:1px solid var(--line); border-radius:14px; background:#fff; }
+    .delivery-card-head { display:flex; justify-content:space-between; gap:14px; align-items:start; }
+    .delivery-card h3 { margin:0; font:700 20px Fraunces,serif; }
+    .delivery-card-meta { margin-top:5px; color:var(--muted); font-size:13px; }
+    .delivery-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:16px; }
+    .delivery-actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:14px; }
+    .delivery-actions .primary, .delivery-actions .secondary { flex:1; }
+    .review-list { display:grid; gap:12px; }
+    .review-item { padding:18px 0; border-bottom:1px solid var(--line); }
+    .review-item:first-child { padding-top:0; }
+    .review-item:last-child { border-bottom:0; }
+    .review-head { display:flex; justify-content:space-between; gap:12px; align-items:start; }
+    .review-rating { color:#8b5c00; font-weight:700; }
+    .toast { position:fixed; right:22px; bottom:22px; z-index:5; max-width:350px; padding:14px 16px; border-radius:10px; color:#fff; background:var(--ink); box-shadow:0 12px 30px rgba(0,0,0,.18); opacity:0; transform:translateY(20px); pointer-events:none; transition:.25s; }
+    .toast.show { opacity:1; transform:translateY(0); }
+    dialog { width:min(420px,calc(100% - 28px)); border:1px solid var(--line); border-radius:14px; padding:0; color:var(--ink); background:#fffdf9; box-shadow:0 24px 80px rgba(17,17,17,.24); }
+    dialog::backdrop { background:rgba(17,17,17,.55); backdrop-filter:blur(3px); }
+    .login-form { display:grid; gap:14px; padding:24px; }
+    .login-form h2 { margin:0; font:700 24px Fraunces,serif; }
+    .login-actions { display:flex; justify-content:flex-end; gap:8px; }
+    @media (max-width:1050px) { .shell { grid-template-columns:76px minmax(0,1fr); } .sidebar { padding:22px 12px; } .brand { padding:0 5px 22px; } .brand-name { font-size:0; } .brand-name::after { content:"SP"; font:700 22px Fraunces,serif; } .brand-kicker, .side-nav span, .side-foot { display:none; } .side-nav button { justify-content:center; } .workspace { grid-template-columns:1fr; } .detail { position:static; } }
+    @media (max-width:700px) { .main { padding:20px 13px 35px; } .topbar { display:block; } .sync { margin-top:15px; width:max-content; } .stats { grid-template-columns:1fr 1fr; } .filters { display:grid; grid-template-columns:1fr; } .order-row { grid-template-columns:1fr auto; gap:8px; } .row-type, .row-total { text-align:left; } .row-total { grid-column:2; grid-row:1 / span 2; align-self:start; } .order-row .status { grid-column:1; } .menu-editor { grid-template-columns:1fr; } .menu-editor .full { grid-column:auto; } .menu-actions { grid-column:auto; } .menu-item { grid-template-columns:1fr auto; } .menu-item-actions { grid-column:2; grid-row:1 / span 2; flex-direction:column; } }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-name">Swahili Plate</div><div class="brand-kicker">Operations desk</div></div>
+      <nav class="side-nav" aria-label="Admin navigation">
+        <button id="orders-nav-button" class="active" type="button" onclick="showOrders()"><i data-lucide="layout-dashboard"></i><span>Orders</span></button>
+        <button id="menu-nav-button" type="button" onclick="showMenuManagement()"><i data-lucide="utensils"></i><span>Menu</span></button>
+        <button id="branch-nav-button" type="button" onclick="showBranchManagement()"><i data-lucide="map-pin"></i><span>Branches</span></button>
+        <button id="delivery-nav-button" type="button" onclick="showDeliveryManagement()"><i data-lucide="bike"></i><span>Deliveries</span></button>
+        <button id="reviews-nav-button" type="button" onclick="showReviewManagement()"><i data-lucide="star"></i><span>Reviews</span></button>
+      </nav>
+      <div class="side-foot">A clear view of every plate, table and delivery.</div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div><p class="eyebrow">Swahili Plate / Operations</p><h1 id="page-title">Orders today</h1><p id="page-subtitle" class="subtle">Track the kitchen queue, tables and riders from one place.</p></div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end"><button id="admin-login-button" class="secondary" type="button" onclick="openAdminLogin()"><i data-lucide="key-round" style="width:15px;vertical-align:-3px"></i> Admin sign in</button><button id="notification-button" class="secondary" type="button" onclick="enableNotifications()"><i data-lucide="bell" style="width:15px;vertical-align:-3px"></i> Enable alerts</button><div class="sync"><span id="sync-dot" class="dot"></span><span id="sync-label">Connecting to orders</span></div></div>
+      </header>
+      <section class="stats" aria-label="Order summary">
+        <article class="stat"><div class="stat-top"><span>All orders</span><span class="stat-icon"><i data-lucide="receipt"></i></span></div><div id="stat-all" class="stat-value">0</div></article>
+        <article class="stat"><div class="stat-top"><span>Needs action</span><span class="stat-icon" style="color:#b95032;background:#fae4dc"><i data-lucide="bell-ring"></i></span></div><div id="stat-action" class="stat-value">0</div></article>
+        <article class="stat"><div class="stat-top"><span>Deliveries</span><span class="stat-icon"><i data-lucide="bike"></i></span></div><div id="stat-delivery" class="stat-value">0</div></article>
+        <article class="stat"><div class="stat-top"><span>Sales value</span><span class="stat-icon" style="color:#b95032;background:#fff0d8"><i data-lucide="coins"></i></span></div><div id="stat-sales" class="stat-value">KES 0</div></article>
+      </section>
+      <div id="orders-workspace" class="workspace">
+        <section class="panel">
+          <div class="panel-head"><h2>Live order queue</h2><button class="secondary" type="button" onclick="loadOrders()"><i data-lucide="refresh-cw" style="width:15px;vertical-align:-3px"></i> Refresh</button></div>
+          <div class="filters"><input id="search" class="field" type="search" placeholder="Search customer, phone or order ID"><select id="status-filter" class="field" aria-label="Filter by status"><option value="all">All statuses</option><option>New</option><option>Confirmed</option><option>Preparing</option><option>Ready</option><option>Out for delivery</option><option>Completed</option><option>Cancelled</option></select><select id="mode-filter" class="field" aria-label="Filter by order mode"><option value="all">All order types</option><option>Dine in</option><option>Delivery</option><option>Take out</option><option>Pick up</option></select></div>
+          <div id="orders" class="orders"><div class="empty">Loading customer orders...</div></div>
+        </section>
+        <aside id="detail" class="panel detail" aria-live="polite"><div class="detail-empty"><i data-lucide="mouse-pointer-click" style="width:30px;height:30px"></i><p>Select an order to see customer, meal, payment and delivery details.</p></div></aside>
+      </div>
+      <section id="menu-panel" class="panel menu-panel" hidden>
+        <div class="panel-head" style="padding:0 0 16px"><h2>Menu management</h2><button class="secondary" type="button" onclick="showOrders()"><i data-lucide="arrow-left" style="width:15px;vertical-align:-3px"></i> Back to orders</button></div>
+        <form id="menu-form" class="menu-editor">
+          <input id="menu-edit-index" type="hidden" value="">
+          <label>Menu type<select id="menu-type" class="field" required><option value="food">Food</option><option value="drinks">Drinks</option></select></label>
+          <label>Category<input id="menu-category" class="field" required placeholder="e.g. Breakfast or Iced Coffee"></label>
+          <label>Product name<input id="menu-name" class="field" required placeholder="Product name"></label>
+          <label>Price (KES)<input id="menu-price" class="field" required min="0" step="1" type="number" placeholder="0"></label>
+          <label class="full">Description<input id="menu-description" class="field" required placeholder="Short description shown to customers"></label>
+          <label class="full">Variants <span class="menu-item-meta">Optional: Single:200, Double:250</span><input id="menu-variants" class="field" placeholder="Option:price, Option:price"></label>
+          <label class="full">Labels <span class="menu-item-meta">Optional: Vegetarian, Contains dairy</span><input id="menu-labels" class="field" placeholder="Label, Label"></label>
+          <div class="menu-actions"><button id="menu-submit" class="primary" type="submit">Add product for new menu items</button><button id="menu-cancel" class="secondary" type="button" onclick="resetMenuForm()" hidden>Cancel edit</button></div>
+        </form>
+        <div class="filters" style="padding-left:0;padding-right:0"><input id="menu-search" class="field" type="search" placeholder="Search menu items"><select id="menu-filter" class="field" aria-label="Filter menu items"><option value="all">All menu types</option><option value="food">Food</option><option value="drinks">Drinks</option></select></div>
+        <div id="menu-list" class="menu-list"><div class="menu-empty">Loading menu catalog...</div></div>
+      </section>
+      <section id="branch-panel" class="panel branch-panel" hidden>
+        <div class="panel-head" style="padding:0 0 16px"><h2>Branch management</h2><button class="secondary" type="button" onclick="showOrders()"><i data-lucide="arrow-left" style="width:15px;vertical-align:-3px"></i> Back to orders</button></div>
+        <form id="branch-form" class="branch-form">
+          <section class="branch-section"><h3>Business information</h3><div class="branch-grid"><label>Business name<input id="business-name" class="field" required></label><label class="full">Business description<textarea id="business-description" class="field" rows="3" required></textarea></label></div></section>
+          <section class="branch-section"><h3>Customer reviews</h3><div class="branch-grid"><label>Phone number<input id="business-phone" class="field" type="tel" required></label><label>Email address<input id="business-email" class="field" type="email" required></label></div></section>
+          <section class="branch-section"><h3>Branch delivery and working hours</h3><div class="traffic-note">The customer-facing estimate is the branch base delivery time. When traffic is experienced, the page adds 15 minutes automatically.</div><div id="branch-editors"></div></section>
+          <button class="primary" type="submit">Update branch information</button>
+        </form>
+      </section>
+      <section id="delivery-panel" class="panel branch-panel" hidden>
+        <div class="panel-head" style="padding:0 0 16px"><h2>Deliveries</h2><button class="secondary" type="button" onclick="loadOrders()"><i data-lucide="refresh-cw" style="width:15px;vertical-align:-3px"></i> Refresh deliveries</button></div>
+        <p class="traffic-note">Riders can accept a delivery, report traffic, and publish progress. Customers and the admin order queue receive the same update.</p>
+        <div id="delivery-list" class="delivery-list" style="margin-top:18px"><div class="empty">Loading deliveries...</div></div>
+      </section>
+      <section id="reviews-panel" class="panel branch-panel" hidden>
+        <div class="panel-head" style="padding:0 0 16px"><h2>Customer reviews</h2><button class="secondary" type="button" onclick="loadReviews()"><i data-lucide="refresh-cw" style="width:15px;vertical-align:-3px"></i> Refresh reviews</button></div>
+        <div id="reviews-list" class="review-list"><div class="empty">Loading customer reviews...</div></div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="admin-login-dialog" aria-labelledby="admin-login-title">
+    <form id="admin-login-form" class="login-form">
+      <h2 id="admin-login-title">Connect to live orders</h2>
+      <p class="subtle" style="margin:0">Enter the admin access secret configured for the deployed service.</p>
+      <label for="admin-token-input">Admin access secret</label>
+      <input id="admin-token-input" class="field" type="password" autocomplete="current-password" required>
+      <div class="login-actions"><button class="secondary" type="button" onclick="closeAdminLogin()">Cancel</button><button class="primary" type="submit">Connect</button></div>
+    </form>
+  </dialog>
+<script>
+  const demoOrders = [
+    { id:"demo-1048", customer_name:"Amina Hassan", customer_phone:"0712 345 678", customer_email:"amina@example.com", branch:"CBD", ordering_mode:"Delivery", cart_items:JSON.stringify([{name:"Chicken Biryani",price:900,quantity:2},{name:"Iced Dawa",price:280,quantity:1}]), subtotal:2080, service_fee:250, grand_total:2330, special_requests:"Please make the biryani mildly spiced.", delivery_address:"Delta Towers, Wood Avenue", delivery_area:"Kilimani", delivery_landmark:"Next to Yaya Centre", delivery_instructions:"Call on arrival. Reception can direct you to floor 4.", rider_name:"", rider_phone:"", order_status:"New", payment_method:"M-Pesa / payment contact", payment_status:"Payment pending - order submitted", order_timestamp:new Date().toISOString() },
+    { id:"demo-1047", customer_name:"David Otieno", customer_phone:"0770 111 222", customer_email:"david@example.com", branch:"Sarit Centre", ordering_mode:"Dine in", cart_items:JSON.stringify([{name:"Mutton Mandhi",price:1200,quantity:1},{name:"Swahili Tea",price:150,quantity:2}]), subtotal:1500, service_fee:0, grand_total:1500, reservation_date:new Date().toISOString().slice(0,10), reservation_time:"19:30", party_size:3, special_requests:"Birthday table if possible.", delivery_address:"", delivery_area:"", delivery_landmark:"", delivery_instructions:"", rider_name:"", rider_phone:"", order_status:"Confirmed", payment_method:"Pay in person", payment_status:"Reservation submitted - pending confirmation", order_timestamp:new Date(Date.now()-3600000).toISOString() }
+  ];
+  let orders = [];
+  let selectedId = null;
+  let receivedInitialFeed = false;
+  let knownOrderIds = new Set();
+  const ADMIN_TOKEN_STORAGE_KEY = "swahili-plate-admin-token";
+  const MENU_DATA_STORAGE_KEY = "swahili-plate-menu";
+  const menuChannel = "BroadcastChannel" in window ? new BroadcastChannel("swahili-plate-menu") : null;
+  let menuCatalog = {food:[], drinks:[]};
+  const BRANCH_DATA_STORAGE_KEY = "swahili-plate-branch-settings";
+  const branchChannel = "BroadcastChannel" in window ? new BroadcastChannel("swahili-plate-branch-settings") : null;
+  const branchDefaults = {
+    business:{name:"Swahili Plate",description:"A taste of the Swahili coast, served with warm hospitality.",phone:"0711726448",email:"hello@swahiliplate.com"},
+    branches:{
+      "CBD":{address:"Muindi Mbingu Street, opposite Equity Bank.",phone:"0711726448",deliveryMinutes:45,mapUrl:"https://maps.app.goo.gl/GSRCir4nuJ2X2WFeA",images:["https://images.pexels.com/photos/11998535/pexels-photo-11998535.jpeg?auto=compress&cs=tinysrgb&w=800"],hours:{Monday:"08:00-22:00",Tuesday:"08:00-22:00",Wednesday:"08:00-22:00",Thursday:"08:00-22:00",Friday:"08:00-22:00",Saturday:"08:00-22:00",Sunday:"08:00-20:00"}},
+      "Sarit Centre":{address:"Sarit Centre, Parklands / Highridge.",phone:"0773497954",deliveryMinutes:50,mapUrl:"https://maps.app.goo.gl/VsFLp6eGyDj7tTJv6",images:["https://images.pexels.com/photos/18014531/pexels-photo-18014531.jpeg?auto=compress&cs=tinysrgb&w=800"],hours:{Monday:"08:00-22:00",Tuesday:"08:00-22:00",Wednesday:"08:00-22:00",Thursday:"08:00-22:00",Friday:"08:00-22:00",Saturday:"08:00-22:00",Sunday:"08:00-20:00"}}
+    }
+  };
+  let branchSettings = branchDefaults;
+  const weekDays = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  const money = value => "KES " + Number(value || 0).toLocaleString("en-KE");
+  const safe = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[char]));
+  const dateText = value => value ? new Date(value).toLocaleString("en-KE", {dateStyle:"medium", timeStyle:"short"}) : "-";
+  const statusClass = value => String(value || "New").toLowerCase().replace(/\s+/g,"-");
+  function showToast(message) { const toast = document.getElementById("toast"); toast.textContent = message; toast.classList.add("show"); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove("show"), 3500); }
+  function validMenuCatalog(menu) { return menu && Array.isArray(menu.food) && Array.isArray(menu.drinks); }
+  async function readSharedMenu() {
+    try {
+      const {value} = await apiRequest("/api/settings/menu");
+      if (validMenuCatalog(value)) {
+        menuCatalog = value;
+        localStorage.setItem(MENU_DATA_STORAGE_KEY, JSON.stringify(menuCatalog));
+        renderMenuList();
+        return;
+      }
+    } catch { /* Fall back to the cached catalog during service interruptions. */ }
+    try {
+      const cached = JSON.parse(localStorage.getItem(MENU_DATA_STORAGE_KEY) || "null");
+      if (validMenuCatalog(cached)) {
+        menuCatalog = cached;
+        await saveSharedMenu("Menu catalog connected to the shared service.");
+      }
+    } catch { showToast("The shared menu catalog could not be read."); }
+  }
+  async function saveSharedMenu(message) {
+    try {
+      await apiRequest("/api/settings/menu", {method:"PUT", body:JSON.stringify(menuCatalog)});
+      localStorage.setItem(MENU_DATA_STORAGE_KEY, JSON.stringify(menuCatalog));
+      menuChannel?.postMessage({type:"menu_updated", menu:menuCatalog});
+      renderMenuList();
+      if (message) showToast(message);
+    } catch {
+      showToast("Could not save menu changes to the shared service.");
+    }
+  }
+  function parseMenuVariants(value) {
+    return String(value || "").split(",").map(entry => entry.trim()).filter(Boolean).map(entry => {
+      const separator = entry.lastIndexOf(":");
+      if (separator < 1) throw new Error("Each variant must use Option:price format.");
+      const name = entry.slice(0, separator).trim();
+      const price = Number(entry.slice(separator + 1).trim());
+      if (!name || !Number.isFinite(price) || price < 0) throw new Error("Each variant must have a valid name and price.");
+      return {name, price};
+    });
+  }
+  function menuVariantsText(item) { return (item.variants || []).map(variant => `${variant.name}:${variant.price}`).join(", "); }
+  function menuLabelsText(item) { return (item.labels || []).join(", "); }
+  function renderMenuList() {
+    const query = document.getElementById("menu-search").value.trim().toLowerCase();
+    const typeFilter = document.getElementById("menu-filter").value;
+    const holder = document.getElementById("menu-list");
+    const rows = [];
+    ["food", "drinks"].forEach(type => {
+      if (typeFilter !== "all" && typeFilter !== type) return;
+      menuCatalog[type].forEach((item, index) => {
+        const searchable = [type, item.category, item.name, item.description, item.originalName, ...(item.labels || []), ...(item.variants || []).map(variant => variant.name)].join(" ").toLowerCase();
+        if (!query || searchable.includes(query)) rows.push({type, index, item});
+      });
+    });
+    if (!rows.length) { holder.innerHTML = '<div class="menu-empty">No menu items found. Add a product above.</div>'; return; }
+    holder.innerHTML = rows.map(({type, index, item}) => `<article class="menu-item"><div><div class="menu-item-name">${safe(item.name)}</div><div class="menu-item-meta">${safe(type)} · ${safe(item.category)}${item.variants?.length ? " · " + safe(menuVariantsText(item)) : ""}</div></div><strong>${money(item.price)}</strong><div class="menu-item-actions"><button class="secondary" type="button" onclick="editMenuItem('${type}',${index})">Edit</button><button class="secondary danger" type="button" onclick="deleteMenuItem('${type}',${index})">Delete</button></div></article>`).join("");
+  }
+  function resetMenuForm() {
+    document.getElementById("menu-form").reset();
+    document.getElementById("menu-edit-index").value = "";
+    document.getElementById("menu-submit").textContent = "Add product for new menu items";
+    document.getElementById("menu-cancel").hidden = true;
+  }
+  function editMenuItem(type, index) {
+    const item = menuCatalog[type][index];
+    if (!item) return;
+    document.getElementById("menu-edit-index").value = `${type}:${index}`;
+    document.getElementById("menu-type").value = type;
+    document.getElementById("menu-category").value = item.category || "";
+    document.getElementById("menu-name").value = item.name || "";
+    document.getElementById("menu-price").value = item.price ?? "";
+    document.getElementById("menu-description").value = item.description || "";
+    document.getElementById("menu-variants").value = menuVariantsText(item);
+    document.getElementById("menu-labels").value = menuLabelsText(item);
+    document.getElementById("menu-submit").textContent = "Update product for existing items";
+    document.getElementById("menu-cancel").hidden = false;
+    document.getElementById("menu-category").focus();
+  }
+  function deleteMenuItem(type, index) {
+    const item = menuCatalog[type][index];
+    if (!item || !window.confirm(`Delete ${item.name} from the customer menu?`)) return;
+    menuCatalog[type].splice(index, 1);
+    saveSharedMenu(`${item.name} was deleted from the menu.`);
+    resetMenuForm();
+  }
+  async function showMenuManagement() {
+    await readSharedMenu();
+    document.querySelector(".stats").hidden = true;
+    document.getElementById("orders-workspace").hidden = true;
+    document.getElementById("branch-panel").hidden = true;
+    document.getElementById("delivery-panel").hidden = true;
+    document.getElementById("reviews-panel").hidden = true;
+    document.getElementById("menu-panel").hidden = false;
+    document.getElementById("page-title").textContent = "Menu management";
+    document.getElementById("page-subtitle").textContent = "Update products for customers in real time.";
+    document.getElementById("menu-nav-button").classList.add("active");
+    document.getElementById("branch-nav-button").classList.remove("active");
+    document.getElementById("delivery-nav-button").classList.remove("active");
+    document.getElementById("reviews-nav-button").classList.remove("active");
+    document.getElementById("orders-nav-button").classList.remove("active");
+    renderMenuList();
+  }
+  function showOrders() {
+    document.querySelector(".stats").hidden = false;
+    document.getElementById("orders-workspace").hidden = false;
+    document.getElementById("menu-panel").hidden = true;
+    document.getElementById("branch-panel").hidden = true;
+    document.getElementById("delivery-panel").hidden = true;
+    document.getElementById("reviews-panel").hidden = true;
+    document.getElementById("page-title").textContent = "Orders today";
+    document.getElementById("page-subtitle").textContent = "Track the kitchen queue, tables and riders from one place.";
+    document.getElementById("menu-nav-button").classList.remove("active");
+    document.getElementById("branch-nav-button").classList.remove("active");
+    document.getElementById("delivery-nav-button").classList.remove("active");
+    document.getElementById("reviews-nav-button").classList.remove("active");
+    document.getElementById("orders-nav-button").classList.add("active");
+  }
+  async function readBranchSettings() {
+    try {
+      const {value} = await apiRequest("/api/settings/branches");
+      if (value?.business && value?.branches) {
+        branchSettings = value;
+        localStorage.setItem(BRANCH_DATA_STORAGE_KEY, JSON.stringify(branchSettings));
+        return;
+      }
+    } catch { /* Fall back to cached/default branch information while offline. */ }
+    try {
+      const stored = JSON.parse(localStorage.getItem(BRANCH_DATA_STORAGE_KEY) || "null");
+      if (stored?.business && stored?.branches) branchSettings = stored;
+      await saveBranchSettings("");
+    } catch { showToast("The branch settings could not be read."); }
+  }
+  function renderBranchEditors() {
+    document.getElementById("business-name").value = branchSettings.business.name;
+    document.getElementById("business-description").value = branchSettings.business.description;
+    document.getElementById("business-phone").value = branchSettings.business.phone;
+    document.getElementById("business-email").value = branchSettings.business.email;
+    document.getElementById("branch-editors").innerHTML = Object.entries(branchSettings.branches).map(([name, branch]) => `<article class="branch-section"><h3>${safe(name)} branch</h3><div class="branch-grid"><label>Address<input class="field branch-address" data-branch="${safe(name)}" value="${safe(branch.address)}" required></label><label>Branch phone<input class="field branch-phone" data-branch="${safe(name)}" value="${safe(branch.phone)}" required></label><label>Base delivery time (minutes)<input class="field branch-delivery" data-branch="${safe(name)}" type="number" min="0" step="1" value="${Number(branch.deliveryMinutes) || 0}" required></label></div><h4>Working hours</h4><div class="branch-days">${weekDays.map(day => `<label class="day-row"><span>${day}</span><input class="field branch-hours" data-branch="${safe(name)}" data-day="${day}" value="${safe(branch.hours?.[day] || "Closed")}" placeholder="08:00-22:00"></label>`).join("")}</div><h4>Business images</h4><div class="image-list">${(branch.images || []).map((image, index) => `<div class="image-item"><img src="${safe(image)}" alt="${safe(name)} branch image"><button type="button" onclick="deleteBranchImage('${safe(name)}',${index})">Delete image</button></div>`).join("")}</div><div class="branch-grid" style="margin-top:12px"><input id="image-url-${safe(name).replace(/\W/g, "-")}" class="field branch-image-url" data-branch="${safe(name)}" placeholder="Paste image URL to add"><button type="button" class="secondary" onclick="addBranchImage('${safe(name)}')">Add image</button></div></article>`).join("");
+  }
+  async function saveBranchSettings(message) {
+    try {
+      await apiRequest("/api/settings/branches", {method:"PUT", body:JSON.stringify(branchSettings)});
+      localStorage.setItem(BRANCH_DATA_STORAGE_KEY, JSON.stringify(branchSettings));
+      branchChannel?.postMessage({type:"branch_settings_updated", settings:branchSettings});
+      if (message) showToast(message);
+    } catch {
+      showToast("Could not save branch changes to the shared service.");
+    }
+  }
+  function addBranchImage(name) {
+    const id = `image-url-${name.replace(/\W/g, "-")}`;
+    const input = document.getElementById(id);
+    const image = input.value.trim();
+    if (!image) return showToast("Paste an image URL first.");
+    branchSettings.branches[name].images = [...(branchSettings.branches[name].images || []), image];
+    saveBranchSettings(`${name} image added.`);
+    renderBranchEditors();
+  }
+  function deleteBranchImage(name, index) {
+    branchSettings.branches[name].images.splice(index, 1);
+    saveBranchSettings(`${name} image deleted.`);
+    renderBranchEditors();
+  }
+  async function showBranchManagement() {
+    await readBranchSettings();
+    document.querySelector(".stats").hidden = true;
+    document.getElementById("orders-workspace").hidden = true;
+    document.getElementById("menu-panel").hidden = true;
+    document.getElementById("delivery-panel").hidden = true;
+    document.getElementById("reviews-panel").hidden = true;
+    document.getElementById("branch-panel").hidden = false;
+    document.getElementById("page-title").textContent = "Branch management";
+    document.getElementById("page-subtitle").textContent = "Keep business information, branch hours and delivery estimates current.";
+    document.getElementById("menu-nav-button").classList.remove("active");
+    document.getElementById("branch-nav-button").classList.add("active");
+    document.getElementById("delivery-nav-button").classList.remove("active");
+    document.getElementById("reviews-nav-button").classList.remove("active");
+    document.getElementById("orders-nav-button").classList.remove("active");
+    renderBranchEditors();
+  }
+  function showDeliveryManagement() {
+    document.querySelector(".stats").hidden = true;
+    document.getElementById("orders-workspace").hidden = true;
+    document.getElementById("menu-panel").hidden = true;
+    document.getElementById("branch-panel").hidden = true;
+    document.getElementById("reviews-panel").hidden = true;
+    document.getElementById("delivery-panel").hidden = false;
+    document.getElementById("page-title").textContent = "Deliveries";
+    document.getElementById("page-subtitle").textContent = "Accept delivery orders and keep customers informed.";
+    document.getElementById("menu-nav-button").classList.remove("active");
+    document.getElementById("branch-nav-button").classList.remove("active");
+    document.getElementById("delivery-nav-button").classList.add("active");
+    document.getElementById("reviews-nav-button").classList.remove("active");
+    document.getElementById("orders-nav-button").classList.remove("active");
+    renderDeliveries();
+  }
+  async function showReviewManagement() {
+    document.querySelector(".stats").hidden = true;
+    document.getElementById("orders-workspace").hidden = true;
+    document.getElementById("menu-panel").hidden = true;
+    document.getElementById("branch-panel").hidden = true;
+    document.getElementById("delivery-panel").hidden = true;
+    document.getElementById("reviews-panel").hidden = false;
+    document.getElementById("page-title").textContent = "Customer reviews";
+    document.getElementById("page-subtitle").textContent = "Read customer feedback from both branches.";
+    ["orders-nav-button", "menu-nav-button", "branch-nav-button", "delivery-nav-button"].forEach(id => document.getElementById(id).classList.remove("active"));
+    document.getElementById("reviews-nav-button").classList.add("active");
+    await loadReviews();
+  }
+  async function loadReviews() {
+    const holder = document.getElementById("reviews-list");
+    try {
+      const reviews = await apiRequest("/api/reviews");
+      holder.innerHTML = reviews.length ? reviews.map(review => `<article class="review-item"><div class="review-head"><div><strong>${safe(review.name)}</strong><div class="order-meta">${safe(review.branch)} · ${safe(dateText(review.submittedAt))}</div></div><span class="review-rating">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span></div><p style="margin:12px 0 0;line-height:1.65">${safe(review.message)}</p></article>`).join("") : '<div class="empty">No customer reviews yet.</div>';
+    } catch {
+      holder.innerHTML = '<div class="empty">Reviews could not be loaded. Check the admin connection.</div>';
+    }
+  }
+  async function enableNotifications() {
+    if (!("Notification" in window)) return showToast("This browser does not support notifications.");
+    const permission = await Notification.requestPermission();
+    const button = document.getElementById("notification-button");
+    if (permission === "granted") { button.innerHTML = '<i data-lucide="bell-ring" style="width:15px;vertical-align:-3px"></i> Alerts enabled'; lucide.createIcons(); showToast("New order alerts are enabled on this device."); }
+    else showToast("Notifications were not enabled. You can allow them in browser settings.");
+  }
+  function announceNewOrders(newOrders) {
+    newOrders.filter(order => order.order_status === "New").forEach(order => {
+      const message = `${order.customer_name || "New customer"} placed a ${order.ordering_mode || "new"} order${order.branch ? " at " + order.branch : ""}.`;
+      showToast(message);
+      if ("Notification" in window && Notification.permission === "granted") new Notification("New Swahili Plate order", {body:message, tag:`order-${order.id}`});
+    });
+  }
+  function parseItems(order) { try { return typeof order.cart_items === "string" ? JSON.parse(order.cart_items) : order.cart_items || []; } catch { return []; } }
+  function filteredOrders() {
+    const query = document.getElementById("search").value.trim().toLowerCase();
+    const status = document.getElementById("status-filter").value;
+    const mode = document.getElementById("mode-filter").value;
+    return orders.filter(order => {
+      const haystack = [order.id, order.customer_name, order.customer_phone, order.customer_email, order.branch].join(" ").toLowerCase();
+      return (!query || haystack.includes(query)) && (status === "all" || order.order_status === status) && (mode === "all" || order.ordering_mode === mode);
+    });
+  }
+  function renderStats() {
+    document.getElementById("stat-all").textContent = orders.length;
+    document.getElementById("stat-action").textContent = orders.filter(order => ["New","Preparing","Ready"].includes(order.order_status)).length;
+    document.getElementById("stat-delivery").textContent = orders.filter(order => order.ordering_mode === "Delivery").length;
+    document.getElementById("stat-sales").textContent = money(orders.reduce((sum, order) => sum + Number(order.grand_total || 0), 0));
+  }
+  function renderOrders() {
+    const visible = filteredOrders();
+    const holder = document.getElementById("orders");
+    if (!visible.length) { holder.innerHTML = '<div class="empty">No orders match these filters.</div>'; return; }
+    holder.innerHTML = visible.map(order => {
+      const items = parseItems(order);
+      const itemCount = items.reduce((sum,item) => sum + Number(item.quantity || 1), 0);
+      return `<button type="button" class="order-row ${selectedId === order.id ? "selected" : ""}" onclick="selectOrder('${safe(order.id)}')"><div><div class="order-id">#${safe(String(order.id).slice(-6).toUpperCase())}</div><div class="customer">${safe(order.customer_name || "Guest")}</div><div class="order-meta">${safe(dateText(order.order_timestamp))}</div></div><div class="row-type"><span class="status ${statusClass(order.order_status)}">${safe(order.order_status || "New")}</span><div class="order-meta">${safe(order.ordering_mode || "Order")}${order.branch ? " · " + safe(order.branch) : ""}</div></div><div class="order-meta">${itemCount} item${itemCount === 1 ? "" : "s"}</div><div class="row-total">${money(order.grand_total)}</div></button>`;
+    }).join("");
+    renderDeliveries();
+  }
+  function deliveryOrders() {
+    return orders.filter(order => order.ordering_mode === "Delivery" && !["Completed", "Cancelled"].includes(order.order_status));
+  }
+  function renderDeliveries() {
+    const holder = document.getElementById("delivery-list");
+    if (!holder) return;
+    const deliveries = deliveryOrders();
+    if (!deliveries.length) { holder.innerHTML = '<div class="empty">No active delivery orders.</div>'; return; }
+    holder.innerHTML = deliveries.map(order => {
+      const accepted = Boolean(order.rider_name);
+      const traffic = order.delivery_traffic || "Not reported";
+      const status = order.delivery_status || (accepted ? "Accepted" : "Waiting for rider");
+      return `<article class="delivery-card"><div class="delivery-card-head"><div><h3>${safe(order.customer_name || "Guest")}</h3><p class="delivery-card-meta">#${safe(String(order.id).slice(-6).toUpperCase())} · ${safe(order.branch || "Branch")} · ${safe(order.delivery_address || "Address not provided")}</p><p class="delivery-card-meta">${safe(order.delivery_area || "Area not provided")}${order.delivery_landmark ? " · " + safe(order.delivery_landmark) : ""}</p></div><span class="status ${statusClass(order.order_status)}">${safe(status)}</span></div><div class="delivery-grid"><div><div class="info-label">Rider</div><div class="info-value">${safe(order.rider_name || "Not accepted")}</div></div><div><div class="info-label">Traffic</div><div class="info-value">${safe(traffic)}</div></div></div><p class="notice delivery" style="margin:14px 0 0"><strong>Latest update:</strong> ${safe(order.delivery_update || "Waiting for a rider to accept this order.")}</p><div class="delivery-grid"><input id="rider-name-${safe(order.id)}" class="field" placeholder="Rider name" value="${safe(order.rider_name || "")}"><input id="rider-phone-${safe(order.id)}" class="field" placeholder="Rider phone" value="${safe(order.rider_phone || "")}"><select id="delivery-status-${safe(order.id)}" class="field"><option${status === "Accepted" ? " selected" : ""}>Accepted</option><option${status === "Picked up" ? " selected" : ""}>Picked up</option><option${status === "On the way" ? " selected" : ""}>On the way</option><option${status === "Delivered" ? " selected" : ""}>Delivered</option></select><select id="delivery-traffic-${safe(order.id)}" class="field"><option${traffic === "No traffic" ? " selected" : ""}>No traffic</option><option${traffic === "Traffic" ? " selected" : ""}>Traffic</option><option${traffic === "Heavy traffic" ? " selected" : ""}>Heavy traffic</option></select><textarea id="delivery-update-${safe(order.id)}" class="field" rows="2" placeholder="Update for the customer">${safe(order.delivery_update || "")}</textarea></div><div class="delivery-actions"><button class="primary" type="button" onclick="acceptDelivery('${safe(order.id)}')">${accepted ? "Update rider" : "Accept delivery"}</button><button class="secondary" type="button" onclick="postDeliveryUpdate('${safe(order.id)}')">Post delivery update</button></div></article>`;
+    }).join("");
+  }
+  function deliveryOrderStatus(status) { return status === "Delivered" ? "Completed" : status === "Accepted" ? "Out for delivery" : "Out for delivery"; }
+  async function acceptDelivery(id) {
+    const order = orders.find(item => item.id === id);
+    if (!order) return;
+    const riderName = document.getElementById(`rider-name-${id}`).value.trim();
+    const riderPhone = document.getElementById(`rider-phone-${id}`).value.trim();
+    if (!riderName || !riderPhone) return showToast("Enter the rider name and phone before accepting.");
+    order.rider_name = riderName;
+    order.rider_phone = riderPhone;
+    order.order_status = "Out for delivery";
+    order.delivery_status = "Accepted";
+    order.delivery_update = `${riderName} accepted the delivery.`;
+    order.delivery_update_timestamp = new Date().toISOString();
+    try { await persistOrder(order); showToast("Delivery accepted and customer updated."); renderDeliveries(); } catch { showToast("Could not accept this delivery."); }
+  }
+  async function postDeliveryUpdate(id) {
+    const order = orders.find(item => item.id === id);
+    if (!order) return;
+    const deliveryStatus = document.getElementById(`delivery-status-${id}`).value;
+    const traffic = document.getElementById(`delivery-traffic-${id}`).value;
+    const update = document.getElementById(`delivery-update-${id}`).value.trim();
+    order.delivery_status = deliveryStatus;
+    order.delivery_traffic = traffic;
+    order.delivery_update = update || `${deliveryStatus}. Traffic status: ${traffic}.`;
+    order.delivery_update_timestamp = new Date().toISOString();
+    order.order_status = deliveryOrderStatus(deliveryStatus);
+    try { await persistOrder(order); showToast("Delivery update posted to the customer and admin queue."); renderDeliveries(); } catch { showToast("Could not post this delivery update."); }
+  }
+  function selectOrder(id) { selectedId = id; renderOrders(); renderDetail(orders.find(order => order.id === id)); }
+  function openAdminLogin() { const dialog = document.getElementById("admin-login-dialog"); if (!dialog.open) dialog.showModal(); document.getElementById("admin-token-input").focus(); }
+  function closeAdminLogin() { document.getElementById("admin-login-dialog").close(); }
+  async function apiRequest(path, options = {}) {
+    const headers = new Headers(options.headers || {});
+    headers.set("X-Admin-Token", sessionStorage.getItem(ADMIN_TOKEN_STORAGE_KEY) || "");
+    if (options.body) headers.set("Content-Type", "application/json");
+    const response = await fetch(path, {...options, headers});
+    let payload = {};
+    try { payload = await response.json(); } catch { /* A non-JSON response will be reported by status below. */ }
+    if (!response.ok) throw Object.assign(new Error(payload.detail || `Order API returned ${response.status}.`), {status:response.status});
+    return payload;
+  }
+  function renderDetail(order) {
+    const holder = document.getElementById("detail");
+    if (!order) { holder.innerHTML = '<div class="detail-empty"><i data-lucide="mouse-pointer-click" style="width:30px;height:30px"></i><p>Select an order to see customer, meal, payment and delivery details.</p></div>'; lucide.createIcons(); return; }
+    const items = parseItems(order);
+    const delivery = order.ordering_mode === "Delivery";
+    holder.innerHTML = `<div class="panel-head"><h2>Order details</h2><span class="order-id">#${safe(String(order.id).slice(-6).toUpperCase())}</span></div><div class="detail-body"><div class="detail-title"><div><h3>${safe(order.customer_name || "Guest")}</h3><p class="subtle" style="margin:5px 0 0">${safe(dateText(order.order_timestamp))}</p></div><span class="status ${statusClass(order.order_status)}">${safe(order.order_status || "New")}</span></div><div class="detail-section"><h4>Update order</h4><div class="action-grid"><div class="action-row"><select id="detail-status" class="field"><option>New</option><option>Confirmed</option><option>Preparing</option><option>Ready</option><option>Out for delivery</option><option>Completed</option><option>Cancelled</option></select><button class="primary" type="button" onclick="updateStatus()">Save</button></div><div class="action-row"><input id="rider-name" class="field" placeholder="Rider name" value="${safe(order.rider_name)}"><input id="rider-phone" class="field" placeholder="Rider phone" value="${safe(order.rider_phone)}"></div><button class="secondary" type="button" onclick="assignRider()"><i data-lucide="bike" style="width:15px;vertical-align:-3px"></i> Save rider assignment</button></div></div><div class="detail-section"><h4>Customer</h4><div class="info-grid"><div><div class="info-label">Phone</div><div class="info-value"><a href="tel:${safe(order.customer_phone)}">${safe(order.customer_phone || "-")}</a></div></div><div><div class="info-label">Email</div><div class="info-value">${safe(order.customer_email || "-")}</div></div><div><div class="info-label">Branch</div><div class="info-value">${safe(order.branch || "-")}</div></div><div><div class="info-label">Order type</div><div class="info-value">${safe(order.ordering_mode || "-")}</div></div></div></div><div class="detail-section"><h4>Items</h4><div class="items">${items.length ? items.map(item => `<div class="item"><span>${safe(item.quantity || 1)} × ${safe(item.name)}</span><span>${money(Number(item.price || 0) * Number(item.quantity || 1))}</span></div>`).join("") : "<span class='subtle'>No item list attached.</span>"}</div><div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)" class="items"><div class="item"><span>Subtotal</span><span>${money(order.subtotal)}</span></div><div class="item"><span>Service / packing fee</span><span>${money(order.service_fee)}</span></div><div class="item" style="font-size:15px"><strong>Grand total</strong><strong>${money(order.grand_total)}</strong></div></div></div>${delivery ? `<div class="detail-section"><h4>Delivery route</h4><div class="notice delivery"><strong>${safe(order.delivery_address || "Address not provided")}</strong><br>${safe(order.delivery_area || "Area not provided")}${order.delivery_landmark ? " · " + safe(order.delivery_landmark) : ""}<br><span style="display:block;margin-top:8px">${safe(order.delivery_instructions || "No rider instructions added.")}</span></div><div class="info-grid" style="margin-top:12px"><div><div class="info-label">Rider</div><div class="info-value">${safe(order.rider_name || "Unassigned")}</div></div><div><div class="info-label">Rider phone</div><div class="info-value">${safe(order.rider_phone || "-")}</div></div></div></div>` : `<div class="detail-section"><h4>Dining details</h4><div class="notice"><strong>${safe(order.ordering_mode || "Order")}</strong>${order.reservation_date ? `<br>${safe(order.reservation_date)} at ${safe(order.reservation_time || "time pending")} · party of ${safe(order.party_size || "-")}` : ""}</div></div>`}<div class="detail-section"><h4>Requests & payment</h4><div class="notice">${order.special_requests ? `<strong>Special request:</strong> ${safe(order.special_requests)}<br><br>` : "No special requests."}<strong>Payment:</strong> ${safe(order.payment_method || "-")}<br><strong>Status:</strong> ${safe(order.payment_status || "Pending")}</div></div></div>`;
+    document.getElementById("detail-status").value = order.order_status || "New"; lucide.createIcons();
+  }
+  async function persistOrder(order) {
+    const fields = Object.fromEntries(["order_status", "rider_name", "rider_phone", "delivery_status", "delivery_traffic", "delivery_update", "delivery_update_timestamp"].filter(key => key in order).map(key => [key, order[key]]));
+    const updated = await apiRequest(`/api/orders/${encodeURIComponent(order.id)}`, {method:"PATCH", body:JSON.stringify(fields)});
+    Object.assign(order, updated);
+    renderStats(); renderOrders(); renderDetail(order); renderDeliveries();
+  }
+  async function updateStatus() { const order = orders.find(item => item.id === selectedId); if (!order) return; order.order_status = document.getElementById("detail-status").value; try { await persistOrder(order); showToast("Order status updated."); } catch { showToast("Could not update this order."); } }
+  async function assignRider() { const order = orders.find(item => item.id === selectedId); if (!order) return; order.rider_name = document.getElementById("rider-name").value.trim(); order.rider_phone = document.getElementById("rider-phone").value.trim(); try { await persistOrder(order); showToast(order.rider_name ? "Rider assignment saved." : "Rider assignment cleared."); } catch { showToast("Could not save the rider assignment."); } }
+  function mapRecord(record) { const order = {...record}; order.id = record.__backendId || record.id || "order-" + Math.random().toString(36).slice(2); order.__sdkRecord = record; return order; }
+  let loadingOrders = false;
+  async function loadOrders() {
+    const dot = document.getElementById("sync-dot"); const label = document.getElementById("sync-label");
+    if (loadingOrders) return;
+    if (!sessionStorage.getItem(ADMIN_TOKEN_STORAGE_KEY)) { label.textContent = "Admin sign-in required"; dot.classList.remove("live"); return; }
+    loadingOrders = true;
+    try {
+      const nextOrders = (await apiRequest("/api/orders")).map(mapRecord);
+      const newOrders = nextOrders.filter(order => !knownOrderIds.has(order.id));
+      orders = nextOrders;
+      knownOrderIds = new Set(nextOrders.map(order => order.id));
+      if (receivedInitialFeed) announceNewOrders(newOrders);
+      receivedInitialFeed = true;
+      dot.classList.add("live"); label.textContent = "Live order feed";
+      document.getElementById("admin-login-button").textContent = "Admin connected";
+      renderStats(); renderOrders(); renderDeliveries();
+      if (selectedId) renderDetail(orders.find(order => order.id === selectedId));
+      else if (orders.length) selectOrder(orders[0].id);
+    } catch (error) {
+      dot.classList.remove("live");
+      if (error.status === 401) {
+        sessionStorage.removeItem(ADMIN_TOKEN_STORAGE_KEY);
+        label.textContent = "Admin sign-in required";
+        openAdminLogin();
+      } else {
+        label.textContent = "Order service offline";
+      }
+    } finally {
+      loadingOrders = false;
+    }
+  }
+  async function loadSharedSettings() {
+    await Promise.all([readSharedMenu(), readBranchSettings()]);
+  }
+  document.getElementById("admin-login-form").addEventListener("submit", async event => {
+    event.preventDefault();
+    sessionStorage.setItem(ADMIN_TOKEN_STORAGE_KEY, document.getElementById("admin-token-input").value);
+    await loadOrders();
+    if (document.getElementById("sync-label").textContent === "Live order feed") {
+      await loadSharedSettings();
+      closeAdminLogin();
+      document.getElementById("admin-token-input").value = "";
+      document.getElementById("admin-login-button").textContent = "Admin connected";
+    } else {
+      showToast("Could not connect. Check the secret and service status.");
+    }
+  });
+  menuChannel?.addEventListener("message", event => { if (event.data?.type === "menu_updated" && validMenuCatalog(event.data.menu)) { menuCatalog = event.data.menu; renderMenuList(); } });
+  window.addEventListener("storage", event => {
+    if (event.key === MENU_DATA_STORAGE_KEY && event.newValue) {
+      try { const menu = JSON.parse(event.newValue); if (validMenuCatalog(menu)) { menuCatalog = menu; renderMenuList(); } } catch { showToast("The shared menu catalog could not be read."); }
+    }
+  });
+  document.getElementById("menu-form").addEventListener("submit", event => {
+    event.preventDefault();
+    const type = document.getElementById("menu-type").value;
+    const editValue = document.getElementById("menu-edit-index").value;
+    const price = Number(document.getElementById("menu-price").value);
+    if (!Number.isFinite(price) || price < 0) return showToast("Enter a valid product price.");
+    let variants;
+    try { variants = parseMenuVariants(document.getElementById("menu-variants").value); } catch (error) { return showToast(error.message); }
+    const labels = document.getElementById("menu-labels").value.split(",").map(label => label.trim()).filter(Boolean);
+    const item = {
+      category:document.getElementById("menu-category").value.trim(),
+      name:document.getElementById("menu-name").value.trim(),
+      originalName:document.getElementById("menu-name").value.trim(),
+      price,
+      description:document.getElementById("menu-description").value.trim(),
+      ...(variants.length ? {variants} : {}),
+      ...(labels.length ? {labels} : {})
+    };
+    if (editValue) {
+      const [oldType, oldIndex] = editValue.split(":");
+      const oldItem = menuCatalog[oldType][Number(oldIndex)];
+      item.originalName = oldItem?.originalName || item.originalName;
+      if (oldType === type) menuCatalog[type][Number(oldIndex)] = item;
+      else { menuCatalog[oldType].splice(Number(oldIndex), 1); menuCatalog[type].push(item); }
+      saveSharedMenu(`${item.name} was updated. Customers can see the change now.`);
+    } else {
+      menuCatalog[type].push(item);
+      saveSharedMenu(`${item.name} was added to the customer menu.`);
+    }
+    resetMenuForm();
+  });
+  document.getElementById("menu-search").addEventListener("input", renderMenuList);
+  document.getElementById("menu-filter").addEventListener("change", renderMenuList);
+  document.getElementById("branch-form").addEventListener("submit", event => {
+    event.preventDefault();
+    branchSettings.business = {
+      name:document.getElementById("business-name").value.trim(),
+      description:document.getElementById("business-description").value.trim(),
+      phone:document.getElementById("business-phone").value.trim(),
+      email:document.getElementById("business-email").value.trim()
+    };
+    Object.entries(branchSettings.branches).forEach(([name, branch]) => {
+      branch.address = document.querySelector(`.branch-address[data-branch="${name}"]`).value.trim();
+      branch.phone = document.querySelector(`.branch-phone[data-branch="${name}"]`).value.trim();
+      branch.deliveryMinutes = Number(document.querySelector(`.branch-delivery[data-branch="${name}"]`).value) || 0;
+      branch.hours = {};
+      document.querySelectorAll(`.branch-hours[data-branch="${name}"]`).forEach(input => branch.hours[input.dataset.day] = input.value.trim() || "Closed");
+    });
+    saveBranchSettings("Business and branch information updated for customers.");
+  });
+  branchChannel?.addEventListener("message", event => { if (event.data?.type === "branch_settings_updated") { branchSettings = event.data.settings; if (!document.getElementById("branch-panel").hidden) renderBranchEditors(); } });
+  window.addEventListener("storage", event => {
+    if (event.key === BRANCH_DATA_STORAGE_KEY && event.newValue) {
+      try { branchSettings = JSON.parse(event.newValue); if (!document.getElementById("branch-panel").hidden) renderBranchEditors(); } catch { showToast("The branch settings could not be read."); }
+    }
+  });
+  document.getElementById("search").addEventListener("input", renderOrders); document.getElementById("status-filter").addEventListener("change", renderOrders); document.getElementById("mode-filter").addEventListener("change", renderOrders);
+  lucide.createIcons();
+  if (sessionStorage.getItem(ADMIN_TOKEN_STORAGE_KEY)) loadOrders().then(loadSharedSettings); else openAdminLogin();
+  setInterval(loadOrders, 7000);
+</script>
+</body>
+</html>
