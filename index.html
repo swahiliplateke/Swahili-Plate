@@ -932,7 +932,7 @@ summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{mar
        <div class="home-hero-frame relative mx-auto max-w-xl">
         <div class="home-hero-rule absolute -inset-4 rotate-3 rounded-[2.5rem] border-2 border-[#d9902b]" aria-hidden="true"></div>
         <div class="home-hero-video-frame relative h-[370px] overflow-hidden rounded-[2rem] shadow-2xl md:h-[500px]">
-         <video data-template-id="hero-video" class="canva-video h-full w-full object-cover" muted loop playsinline preload="none" poster="Assets(%20Swahili%20plate)/menu-product-images/chicken-biryani.jpg" aria-label="Swahili Plate hero video"><source src="Assets(%20Swahili%20plate)/Swahili%20plate.%20assets/take%205.mp4" type="video/mp4"><source src="Assets(%20Swahili%20plate)/Swahili%20plate.%20assets/take%205.mp4" type="video/mp4"></video>
+         <video data-template-id="hero-video" class="canva-video h-full w-full object-cover" autoplay muted loop playsinline preload="none" poster="Assets(%20Swahili%20plate)/menu-product-images/chicken-biryani.jpg" aria-label="Swahili Plate hero video"><source src="Assets(%20Swahili%20plate)/Swahili%20plate.%20assets/take%205.mp4" type="video/mp4"><source src="Assets(%20Swahili%20plate)/Swahili%20plate.%20assets/take%205.mp4" type="video/mp4"></video>
          <div class="home-hero-caption"><span>SWAHILI PLATE · NAIROBI</span><strong>Karibu nyumbani.</strong></div>
          <button type="button" class="video-sound-button" aria-label="Unmute hero video" aria-pressed="false" onclick="toggleVideoSound(this)">Unmute</button>
         </div>
@@ -989,7 +989,7 @@ summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{mar
    <section id="story" class="route bg-[#fffaf2]">
     <div class="mx-auto grid max-w-7xl gap-10 px-5 py-12 md:grid-cols-2 md:py-20">
      <div class="relative min-h-[380px] overflow-hidden rounded-[2rem] shadow-xl">
-      <video data-template-id="story-video" class="canva-video absolute inset-0 h-full w-full object-cover" muted loop playsinline preload="none" aria-label="Swahili Plate story video"><source src="Assets(%20Swahili%20plate)/web-ready/story-film.mp4" type="video/mp4"><source src="Assets(%20Swahili%20plate)/web-ready/story-film.mp4" type="video/mp4"></video>
+      <video data-template-id="story-video" class="canva-video absolute inset-0 h-full w-full object-cover" autoplay muted loop playsinline preload="none" aria-label="Swahili Plate story video"><source src="Assets(%20Swahili%20plate)/web-ready/story-film.mp4" type="video/mp4"><source src="Assets(%20Swahili%20plate)/web-ready/story-film.mp4" type="video/mp4"></video>
       <button type="button" class="video-sound-button" aria-label="Unmute story video" aria-pressed="false" onclick="toggleVideoSound(this)">Unmute</button>
      </div>
      <div class="flex flex-col justify-center">
@@ -2235,14 +2235,10 @@ summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{mar
       document.querySelectorAll(".route").forEach(section => {
         const isActive = section.id === route;
         section.classList.toggle("active", isActive);
-        section.querySelectorAll("video").forEach(v => {
-          if (isActive) syncVideoPlayback(v);
-          else v.pause();
-        });
+        section.querySelectorAll("video").forEach(syncVideoPlayback);
       });
       document.querySelectorAll(".nav-link").forEach(link => link.classList.toggle("active", link.dataset.route === route));
       window.scrollTo({ top:0, behavior:"smooth" });
-      if (!visibleVideoObserver) syncVisibleVideos();
     }
 
     function goToFoodCategory(category) {
@@ -2508,49 +2504,22 @@ summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{mar
       lucide.createIcons();
     }
 
-    function isVideoNearViewport(video) {
-      const bounds = video.getBoundingClientRect();
-      const margin = 180;
-      return bounds.bottom >= -margin
-        && bounds.top <= window.innerHeight + margin
-        && bounds.right >= 0
-        && bounds.left <= window.innerWidth;
-    }
-
     function syncVideoPlayback(video) {
       video.loop = true;
-      const activeRoute = video.closest(".route.active");
-      if (!activeRoute || !isVideoNearViewport(video)) {
-        video.pause();
-        return;
-      }
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      video.autoplay = true;
       video.defaultMuted = true;
       video.muted = true;
       video.play().catch(() => {});
     }
 
-    const visibleVideoObserver = "IntersectionObserver" in window
-      ? new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) syncVideoPlayback(entry.target);
-          else entry.target.pause();
-        });
-      }, { rootMargin:"180px 0px", threshold:0.01 })
-      : null;
-
     function observeVideos(root = document) {
       root.querySelectorAll("video").forEach(video => {
         video.loop = true;
+        video.autoplay = true;
         video.defaultMuted = true;
         video.muted = true;
-        if (visibleVideoObserver) visibleVideoObserver.observe(video);
-        else syncVideoPlayback(video);
+        syncVideoPlayback(video);
       });
-    }
-
-    function syncVisibleVideos() {
-      document.querySelectorAll("video").forEach(syncVideoPlayback);
     }
 
     function renderFeaturedItems() {
@@ -2568,7 +2537,7 @@ summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{mar
         return `
         <article class="overflow-hidden rounded-2xl bg-white shadow-lg">
           <div class="relative aspect-[4/3] overflow-hidden bg-[#111]">
-            <video class="canva-video h-full w-full object-cover" muted loop playsinline preload="none" aria-label="Swahili Plate video ${index + 1}">
+            <video class="canva-video h-full w-full object-cover" autoplay muted loop playsinline preload="none" aria-label="Swahili Plate video ${index + 1}">
               <source src="Assets(%20Swahili%20plate)/${encoded}" type="video/mp4">
               <source src="/brand-assets/${encoded}" type="video/mp4">
             </video>
@@ -2972,10 +2941,6 @@ summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{mar
       setInterval(refreshSharedConfiguration, 15000);
 
       observeVideos(document);
-      if (!visibleVideoObserver) {
-        window.addEventListener("scroll", syncVisibleVideos, { passive:true });
-        window.addEventListener("resize", syncVisibleVideos);
-      }
     });
   </script>
  
