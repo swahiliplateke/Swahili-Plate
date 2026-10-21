@@ -1437,15 +1437,22 @@
   (() => {
     const loader = document.getElementById("site-loader");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealPage = () => {
+      if (!loader || loader.dataset.ready === "true") return;
+      loader.dataset.ready = "true";
+      loader.setAttribute("aria-hidden", "true");
+      loader.classList.add("is-hidden");
+      document.querySelector("#page-title")?.classList.add("rise-on-load");
+    };
+    // Let visitors in if a background asset or font never finishes loading.
+    const safetyTimeout = window.setTimeout(revealPage, 5000);
+    const revealAfterFonts = () => {
+      window.clearTimeout(safetyTimeout);
+      revealPage();
+    };
     const finishLoading = () => {
       if (!loader || loader.dataset.ready === "true") return;
-      const revealPage = () => {
-        loader.dataset.ready = "true";
-        loader.setAttribute("aria-hidden", "true");
-        loader.classList.add("is-hidden");
-        document.querySelector("#page-title")?.classList.add("rise-on-load");
-      };
-      Promise.resolve(document.fonts?.ready).then(revealPage, revealPage);
+      Promise.resolve(document.fonts?.ready).then(revealAfterFonts, revealAfterFonts);
     };
     if (document.readyState === "complete") finishLoading();
     else window.addEventListener("load", finishLoading, { once:true });
