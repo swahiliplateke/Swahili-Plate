@@ -4,12 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Swahili Plate | Orders</title>
+  <meta name="theme-color" content="#123c4a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Swahili Plate Admin">
+  <link rel="manifest" href="/admin/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/brand-assets/admin-app-icon-192.png">
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alata&family=Cardo:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root { --ink:#123c4a; --ocean:#17677a; --clay:#b95032; --gold:#d9902b; --cream:#fffaf2; --sand:#f7f0e5; --line:#e7dac8; --muted:#60767b; --green:#28654d; --red:#963c25; }
+    :root { --ink:#171615; --ocean:#171615; --clay:#d12635; --gold:#c8a675; --cream:#fcfbf8; --sand:#f4ecdf; --line:#e5d9c6; --muted:#514a42; --green:#28654d; --red:#d12635; }
     * { box-sizing:border-box; }
-    body { margin:0; min-width:320px; color:var(--ink); background:#f6f2eb; font-family:"DM Sans",sans-serif; }
+    body { margin:0; min-width:320px; color:var(--ink); background:#f6f2eb; font-family:"Alata",sans-serif; }
     button, input, select, textarea { font:inherit; }
     button { cursor:pointer; }
     .display { font-family:Fraunces,serif; }
@@ -72,8 +78,8 @@
     .items { display:grid; gap:8px; }
     .item { display:flex; justify-content:space-between; gap:12px; font-size:13px; }
     .item span:last-child { font-weight:700; white-space:nowrap; }
-    .notice { padding:13px; border-radius:10px; color:#7a4b13; background:#fff0d8; font-size:13px; line-height:1.5; }
-    .notice.delivery { color:#17677a; background:#e6f1ef; }
+    .notice { padding:13px; border-radius:10px; color:#111; background:#fff0d8; font-size:13px; line-height:1.5; }
+    .notice.delivery { color:#111; background:#e6f1ef; }
     .action-grid { display:grid; gap:10px; }
     .action-row { display:flex; gap:9px; }
     .action-row .field { flex:1; }
@@ -88,9 +94,18 @@
     .menu-list { display:grid; }
     .menu-item { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(100px,.6fr) auto; gap:14px; align-items:center; padding:15px 0; border-bottom:1px solid #eee5d9; }
     .menu-item:last-child { border-bottom:0; }
+    .menu-item-info { display:flex; min-width:0; align-items:center; gap:12px; }
+    .menu-item-thumbnail { width:68px; height:54px; flex:none; border-radius:8px; object-fit:cover; background:#f0e1ca; }
     .menu-item-name { font-weight:700; }
     .menu-item-meta { margin-top:4px; color:var(--muted); font-size:12px; }
     .menu-item-actions { display:flex; justify-content:flex-end; gap:7px; }
+    .menu-image-preview { width:min(100%,240px); max-height:150px; border:1px solid var(--line); border-radius:10px; object-fit:cover; background:#fff; }
+    .menu-image-library { display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:9px; max-height:340px; margin-top:10px; overflow:auto; }
+    .menu-image-choice { min-width:0; padding:6px; border:1px solid var(--line); border-radius:9px; background:#fff; color:var(--ink); text-align:left; }
+    .menu-image-choice.selected { outline:2px solid var(--teal); border-color:var(--teal); }
+    .menu-image-choice img { display:block; width:100%; height:74px; border-radius:5px; object-fit:cover; background:#f0e1ca; }
+    .menu-image-choice span { display:block; margin-top:5px; overflow-wrap:anywhere; font-size:11px; line-height:1.3; }
+    .menu-image-library-empty { padding:10px; color:var(--muted); font-size:13px; }
     .danger { color:#963c25; border-color:#e6b9aa; }
     .menu-empty { padding:35px 10px; color:var(--muted); text-align:center; }
     .branch-panel { padding:20px; }
@@ -122,7 +137,7 @@
     .review-item:last-child { border-bottom:0; }
     .review-head { display:flex; justify-content:space-between; gap:12px; align-items:start; }
     .review-rating { color:#8b5c00; font-weight:700; }
-    .toast { position:fixed; right:22px; bottom:22px; z-index:5; max-width:350px; padding:14px 16px; border-radius:10px; color:#fff; background:var(--ink); box-shadow:0 12px 30px rgba(0,0,0,.18); opacity:0; transform:translateY(20px); pointer-events:none; transition:.25s; }
+    .toast { position:fixed; right:22px; bottom:22px; z-index:5; max-width:350px; padding:14px 16px; border:1px solid var(--sp-line); border-radius:10px; color:#111; background:#fff; box-shadow:0 12px 30px rgba(0,0,0,.18); opacity:0; transform:translateY(20px); pointer-events:none; transition:.25s; }
     .toast.show { opacity:1; transform:translateY(0); }
     dialog { width:min(420px,calc(100% - 28px)); border:1px solid var(--line); border-radius:14px; padding:0; color:var(--ink); background:#fffdf9; box-shadow:0 24px 80px rgba(17,17,17,.24); }
     dialog::backdrop { background:rgba(17,17,17,.55); backdrop-filter:blur(3px); }
@@ -131,26 +146,366 @@
     .login-actions { display:flex; justify-content:flex-end; gap:8px; }
     @media (max-width:1050px) { .shell { grid-template-columns:76px minmax(0,1fr); } .sidebar { padding:22px 12px; } .brand { padding:0 5px 22px; } .brand-name { font-size:0; } .brand-name::after { content:"SP"; font:700 22px Fraunces,serif; } .brand-kicker, .side-nav span, .side-foot { display:none; } .side-nav button { justify-content:center; } .workspace { grid-template-columns:1fr; } .detail { position:static; } }
     @media (max-width:700px) { .main { padding:20px 13px 35px; } .topbar { display:block; } .sync { margin-top:15px; width:max-content; } .stats { grid-template-columns:1fr 1fr; } .filters { display:grid; grid-template-columns:1fr; } .order-row { grid-template-columns:1fr auto; gap:8px; } .row-type, .row-total { text-align:left; } .row-total { grid-column:2; grid-row:1 / span 2; align-self:start; } .order-row .status { grid-column:1; } .menu-editor { grid-template-columns:1fr; } .menu-editor .full { grid-column:auto; } .menu-actions { grid-column:auto; } .menu-item { grid-template-columns:1fr auto; } .menu-item-actions { grid-column:2; grid-row:1 / span 2; flex-direction:column; } }
+
+    /* Shared operations design layer */
+    :root {
+      color-scheme:light;
+      --turbo-red:#d12635;
+      --hyperblack:#171615;
+      --desert-dash:#c8a675;
+      --lightning-white:#fcfbf8;
+      --ink:var(--hyperblack);
+      --ocean:var(--hyperblack);
+      --clay:var(--turbo-red);
+      --gold:var(--desert-dash);
+      --cream:var(--lightning-white);
+      --sand:#f4ecdf;
+      --line:#e5d9c6;
+      --muted:#514a42;
+      --red:var(--turbo-red);
+      --sp-page:var(--lightning-white);
+      --sp-surface:#fff;
+      --sp-surface-raised:#f4ecdf;
+      --sp-ink:var(--hyperblack);
+      --sp-copy:#514a42;
+      --sp-line:#e5d9c6;
+      --sp-sea:var(--hyperblack);
+      --sp-rust:var(--turbo-red);
+      --sp-gold:#8b693b;
+      --sp-green:#337154;
+      --sp-red:#a74730;
+      --sp-shadow:0 10px 30px rgba(26,49,46,.055);
+    }
+    html { scroll-behavior:smooth; scroll-padding-top:24px; }
+    body { min-width:320px; color:var(--sp-ink); background:var(--sp-page); font-family:"Alata",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    :where(button,a,input,select,textarea,[tabindex]):focus-visible { outline:3px solid var(--sp-gold); outline-offset:3px; }
+    .shell { grid-template-columns:248px minmax(0,1fr); }
+    .sidebar { position:sticky; top:0; display:flex; height:100vh; flex-direction:column; padding:26px 18px; color:var(--sp-ink); background:var(--sp-surface); border-right:1px solid var(--sp-line); }
+    .brand { display:flex; align-items:center; gap:12px; padding:2px 8px 22px; border-bottom:1px solid var(--sp-line); }
+    .brand-mark { display:block; width:auto; height:56px; max-width:42px; object-fit:contain; flex:none; filter:drop-shadow(0 2px 5px rgba(23,22,21,.08)); }
+    .brand-name { color:var(--sp-ink); font:700 21px/1.05 "Cardo",Georgia,serif; letter-spacing:-.045em; }
+    .brand-kicker { margin-top:5px; color:var(--sp-rust); font-size:10px; font-weight:700; letter-spacing:.13em; }
+    .side-nav { margin-top:22px; display:grid; gap:5px; }
+    .side-nav button { min-height:48px; padding:0 13px; border-radius:12px; color:var(--sp-copy); transition:background-color .2s,color .2s,transform .2s; }
+    .side-nav button i { width:19px; height:19px; }
+    .side-nav button.active { color:white; background:var(--sp-ink); box-shadow:0 7px 16px rgba(23,59,64,.15); }
+    .side-nav button:not(.active):hover { color:var(--sp-ink); background:var(--sp-surface-raised); }
+    .side-foot { position:static; width:auto; margin-top:auto; padding:16px 8px 0; color:var(--sp-copy); font-size:12px; }
+    .main { max-width:1680px; width:100%; margin-inline:auto; padding:clamp(24px,4vw,52px) clamp(22px,4vw,58px) 56px; }
+    .topbar { align-items:center; margin-bottom:30px; }
+    .eyebrow { margin-bottom:9px; color:var(--sp-rust); font-size:10px; letter-spacing:.17em; }
+    h1 { color:var(--sp-ink); font:800 clamp(30px,3.3vw,44px)/1.05 "Cardo",Georgia,serif; letter-spacing:-.06em; }
+    .subtle { color:var(--sp-copy); }
+    .topbar > div:last-child { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:9px; }
+    .sync { min-height:44px; padding:0 12px; border-color:var(--sp-line); background:var(--sp-surface); color:var(--sp-copy); }
+    .dot { width:8px; height:8px; background:var(--sp-gold); }
+    .dot.live { background:#4c9a70; box-shadow:0 0 0 4px rgba(76,154,112,.12); }
+    .stats { gap:14px; margin-bottom:22px; }
+    .stat,.panel { border:1px solid var(--sp-line); border-radius:18px; background:var(--sp-surface); box-shadow:var(--sp-shadow); }
+    .stat { min-height:128px; padding:20px; }
+    .stat-top { color:var(--sp-copy); font-size:10px; letter-spacing:.11em; }
+    .stat-icon { width:36px; height:36px; border-radius:12px; color:var(--sp-sea); background:#e8f1ed; }
+    .stat-value { margin-top:14px; color:var(--sp-ink); font:800 clamp(25px,2.4vw,32px)/1 "Cardo",Georgia,serif; letter-spacing:-.04em; }
+    .workspace { grid-template-columns:minmax(0,1.35fr) minmax(340px,.72fr); gap:18px; }
+    .panel { overflow:hidden; }
+    .panel-head { min-height:68px; padding:16px 19px; border-color:var(--sp-line); }
+    .panel-head h2 { color:var(--sp-ink); font:700 19px/1.2 "Cardo",Georgia,serif; letter-spacing:-.035em; }
+    .filters { gap:8px; padding:16px; border-color:var(--sp-line); }
+    .field { min-height:48px; padding:12px; border:1px solid var(--sp-line); border-radius:12px; color:var(--sp-ink); background:var(--sp-surface); outline:none; transition:border-color .18s,box-shadow .18s; }
+    .field::placeholder { color:#869291; }
+    .field:focus { border-color:var(--sp-sea); box-shadow:0 0 0 3px rgba(23,103,122,.12); }
+    .filters .field:first-child { flex:1.2; }
+    .order-row { min-height:80px; grid-template-columns:minmax(130px,1.15fr) minmax(108px,.8fr) minmax(70px,.55fr) auto; gap:12px; padding:16px; border:0; border-bottom:1px solid var(--sp-line); background:var(--sp-surface); color:var(--sp-ink); text-align:left; transition:background-color .18s; }
+    .order-row:hover { background:#f6f4ee; }
+    .order-row.selected { background:#edf3ef; box-shadow:inset 3px 0 0 var(--sp-sea); }
+    .order-id { color:var(--sp-rust); font-size:11px; letter-spacing:.06em; }
+    .customer { color:var(--sp-ink); }
+    .order-meta { color:var(--sp-copy); font-size:11px; line-height:1.45; }
+    .status { min-height:26px; padding:5px 10px; font-size:10px; letter-spacing:.01em; }
+    .status.new { color:#78521b; background:#f8edcf; }
+    .status.confirmed,.status.ready { color:#285d45; background:#e4f0e8; }
+    .status.preparing { color:#245b68; background:#e3eff0; }
+    .status.out { color:#674f83; background:#eee8f5; }
+    .status.completed { color:#4e6267; background:#e8eeee; }
+    .status.cancelled { color:#873a29; background:#f7e6df; }
+    .row-total { color:var(--sp-ink); font-size:13px; }
+    .empty { padding:52px 20px; color:var(--sp-copy); }
+    .detail { top:24px; border-radius:18px; }
+    .detail-body { padding:20px; }
+    .detail-empty { padding:52px 18px; color:var(--sp-copy); }
+    .detail-title h3,.delivery-card h3 { color:var(--sp-ink); font:700 23px/1.15 "Cardo",Georgia,serif; letter-spacing:-.04em; }
+    .detail-section { margin-top:20px; padding-top:16px; border-color:var(--sp-line); }
+    .detail-section h4 { margin-bottom:13px; color:var(--sp-copy); font-size:10px; letter-spacing:.14em; }
+    .info-label { color:var(--sp-copy); font-size:10px; letter-spacing:.04em; }
+    .info-value { color:var(--sp-ink); font-size:13px; line-height:1.5; }
+    .info-value a { color:var(--sp-sea); }
+    .item { color:var(--sp-ink); }
+    .notice { padding:12px 16px; border:1px solid #ead9ad; border-radius:12px; color:#111; background:#fbf2dc; line-height:1.55; }
+    .notice.delivery { border-color:#d5e4df; color:#111; background:#e9f2ee; }
+    .primary,.secondary { min-height:48px; border-radius:12px; padding:0 16px; font-weight:700; transition:transform .18s,background-color .18s,border-color .18s; }
+    .primary { color:#fff; background:var(--sp-rust); }
+    .primary:hover { background:#873a29; }
+    .secondary { color:var(--sp-ink); border:1px solid var(--sp-line); background:var(--sp-surface); }
+    .secondary:hover { border-color:#b8c9c1; background:var(--sp-surface-raised); }
+    .primary:active,.secondary:active { transform:translateY(1px); }
+    .action-grid { gap:11px; }
+    .action-row { gap:8px; }
+    .menu-panel,.branch-panel { padding:clamp(16px,3vw,28px); }
+    .menu-editor { gap:16px; padding:20px; border:1px solid var(--sp-line); border-radius:16px; background:var(--sp-surface-raised); }
+    .menu-editor label,.branch-form label { display:grid; gap:7px; color:var(--sp-ink); font-size:13px; font-weight:700; }
+    .menu-editor .menu-item-meta { color:var(--sp-copy); font-size:11px; font-weight:400; }
+    .menu-list { margin-top:7px; }
+    .menu-item { padding:16px 4px; border-color:var(--sp-line); }
+    .menu-item-thumbnail { width:72px; height:60px; border-radius:12px; background:var(--sp-surface-raised); }
+    .menu-item-name { color:var(--sp-ink); }
+    .menu-item-meta,.menu-image-library-empty { color:var(--sp-copy); }
+    .menu-image-preview { border-color:var(--sp-line); border-radius:14px; }
+    .menu-image-library { gap:12px; }
+    .menu-image-choice { border-color:var(--sp-line); border-radius:12px; background:var(--sp-surface); color:var(--sp-ink); }
+    .menu-image-choice.selected { border-color:var(--sp-sea); outline:2px solid rgba(23,103,122,.2); }
+    .menu-image-choice img { border-radius:8px; }
+    .menu-empty { color:var(--sp-copy); }
+    .branch-section { border-color:var(--sp-line); }
+    .branch-section h3 { color:var(--sp-ink); font:700 19px/1.2 "Cardo",Georgia,serif; }
+    .branch-grid { gap:16px; }
+    .day-row { margin-top:8px; }
+    .traffic-note { border:1px solid #d5e4df; border-radius:13px; color:#285965; background:#e9f2ee; line-height:1.55; }
+    .delivery-list { gap:14px; }
+    .delivery-card { border-color:var(--sp-line); border-radius:18px; background:var(--sp-surface); box-shadow:var(--sp-shadow); }
+    .delivery-card-meta { color:var(--sp-copy); line-height:1.5; }
+    .delivery-grid { gap:12px; }
+    .delivery-actions { gap:9px; }
+    .review-item { border-color:var(--sp-line); }
+    .review-rating { color:#845d14; }
+    .revenue-overview { display:grid; grid-template-columns:minmax(230px,.7fr) minmax(0,1.3fr); gap:14px; margin-top:18px; }
+    .revenue-total-card,.revenue-history { padding:20px; border:1px solid var(--sp-line); border-radius:16px; background:var(--sp-surface); }
+    .revenue-total-label { color:var(--sp-copy); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+    .revenue-total-value { margin-top:12px; color:var(--sp-ink); font:700 clamp(28px,4vw,42px)/1.05 "Cardo",Georgia,serif; }
+    .revenue-row { display:grid; grid-template-columns:minmax(100px,.7fr) minmax(80px,1.2fr) minmax(90px,.7fr); align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--sp-line); }
+    .revenue-row:last-child { border-bottom:0; }
+    .revenue-month { color:var(--sp-ink); font-size:13px; font-weight:700; }
+    .revenue-track { height:9px; overflow:hidden; border-radius:99px; background:var(--sp-surface-raised); }
+    .revenue-fill { height:100%; border-radius:inherit; background:var(--sp-rust); }
+    .revenue-amount { color:var(--sp-ink); font-size:12px; text-align:right; white-space:nowrap; }
+    .side-nav button[hidden] { display:none; }
+    .toast { right:22px; bottom:22px; border:1px solid var(--sp-line); border-radius:14px; color:#111; background:#fff; box-shadow:0 16px 38px rgba(15,32,30,.2); }
+    dialog { border-color:var(--sp-line); border-radius:20px; background:var(--sp-surface); box-shadow:0 28px 90px rgba(17,34,31,.25); }
+    .login-form { gap:15px; padding:28px; }
+    .login-form h2 { color:var(--sp-ink); font:700 25px/1.15 "Cardo",Georgia,serif; letter-spacing:-.04em; }
+    @media (max-width:1050px) {
+      .shell { display:block; }
+      .sidebar { position:sticky; z-index:10; top:0; height:auto; display:grid; grid-template-columns:minmax(170px,.6fr) minmax(0,1.4fr); gap:12px 20px; padding:12px 20px 10px; border-right:0; border-bottom:1px solid var(--sp-line); box-shadow:0 6px 20px rgba(20,45,43,.06); }
+      .brand { grid-row:1; padding:0; border:0; }
+      .brand-mark { height:46px; max-width:34px; }
+      .brand-name { font-size:18px; }
+      .brand-kicker { display:block; font-size:9px; }
+      .side-nav { grid-row:1; grid-column:2; display:flex; align-items:center; justify-content:flex-end; gap:4px; margin:0; overflow-x:auto; }
+      .side-nav button { width:auto; flex:none; min-height:44px; padding:0 12px; }
+      .side-nav button span { display:inline; }
+      .side-foot { display:none; }
+      .workspace { grid-template-columns:1fr; }
+      .detail { position:static; }
+    }
+    @media (max-width:700px) {
+      .sidebar { grid-template-columns:1fr; gap:8px; padding:10px 14px 8px; }
+      .brand { grid-row:1; }
+      .brand-mark { height:40px; max-width:30px; }
+      .brand-name { font-size:17px; }
+      .brand-kicker { display:none; }
+      .side-nav { grid-row:2; grid-column:1; justify-content:flex-start; margin-inline:-2px; }
+      .side-nav button { min-width:44px; padding:0 11px; gap:7px; font-size:12px; }
+      .side-nav button i { width:17px; height:17px; }
+      .side-nav button span { display:inline; }
+      .main { padding:24px 16px 40px; }
+      .topbar { display:grid; gap:16px; margin-bottom:20px; }
+      .topbar > div:last-child { justify-content:flex-start; }
+      .topbar > div:last-child > button { flex:1; }
+      .sync { flex:1 0 100%; width:max-content; margin:0; }
+      .stats { gap:8px; margin-bottom:16px; }
+      .stat { min-height:108px; padding:12px; border-radius:16px; }
+      .stat-top { align-items:center; font-size:9px; }
+      .stat-icon { width:30px; height:30px; }
+      .stat-value { font-size:24px; }
+      .panel-head { min-height:64px; padding:12px 16px; }
+      .panel-head h2 { font-size:17px; }
+      .filters { display:grid; grid-template-columns:1fr; padding:12px 16px; }
+      .order-row { grid-template-columns:minmax(0,1fr) auto; gap:8px; padding:16px; }
+      .row-type { grid-column:1; grid-row:2; }
+      .order-row > .order-meta:not(.row-type .order-meta) { grid-column:1; grid-row:3; }
+      .row-total { grid-column:2; grid-row:1 / span 2; align-self:start; padding-top:3px; }
+      .order-row .status { max-width:100%; white-space:normal; }
+      .detail-body { padding:16px; }
+      .action-row { flex-direction:column; }
+      .action-row > * { width:100%; }
+      .menu-editor { grid-template-columns:1fr; gap:12px; padding:16px; }
+      .menu-editor .full,.menu-actions { grid-column:auto; }
+      .menu-item { grid-template-columns:minmax(0,1fr) auto; gap:12px; }
+      .menu-item-actions { grid-column:2; grid-row:1 / span 2; flex-direction:column; }
+      .branch-grid,.branch-days,.delivery-grid { grid-template-columns:1fr; }
+      .revenue-overview { grid-template-columns:1fr; }
+      .revenue-row { grid-template-columns:minmax(90px,.7fr) minmax(50px,1fr) minmax(84px,.7fr); gap:8px; }
+      .revenue-total-card,.revenue-history { padding:16px; }
+      .branch-grid .full { grid-column:auto; }
+      .day-row { grid-template-columns:1fr 1fr; }
+      .delivery-card { padding:16px; }
+      .delivery-card-head { flex-direction:column; }
+      .delivery-actions > button { flex:1 1 100%; }
+      .toast { right:12px; bottom:12px; left:12px; max-width:none; }
+    }
+    @media (prefers-color-scheme:dark) {
+      :root { color-scheme:dark; --sp-page:#171615; --sp-surface:#24211e; --sp-surface-raised:#302a23; --sp-ink:#f7f4ee; --sp-copy:#d0c8bd; --sp-line:#4a4035; --sp-sea:#d7c09a; --sp-rust:#ff626b; --sp-gold:#d7c09a; --sp-green:#80c49d; --sp-red:#ff626b; --sp-shadow:0 12px 34px rgba(0,0,0,.3); --ink:#f7f4ee; --ocean:#d7c09a; --clay:#ff626b; --gold:#d7c09a; --cream:#24211e; --sand:#302a23; --line:#4a4035; --muted:#d0c8bd; --red:#ff626b; }
+      body { color:var(--sp-ink); background:var(--sp-page); }
+      .sidebar,.stat,.panel,.delivery-card,dialog { border-color:var(--sp-line); background:var(--sp-surface); }
+      .sidebar { box-shadow:0 8px 22px rgba(0,0,0,.12); }
+      .brand-name,h1,.panel-head h2,.stat-value,.customer,.row-total,.menu-item-name,.branch-section h3,.detail-title h3,.delivery-card h3,.login-form h2 { color:var(--sp-ink); }
+      .brand-kicker,.eyebrow,.order-id { color:var(--sp-rust); }
+      .side-nav button { color:var(--sp-copy); }
+      .side-nav button.active { color:#14211e; background:var(--sp-sea); }
+      .side-nav button:not(.active):hover,.order-row:hover { color:var(--sp-ink); background:var(--sp-surface-raised); }
+      .side-nav button.active { color:#10211e; }
+      .topbar .subtle,.subtle,.order-meta,.info-label,.menu-item-meta,.delivery-card-meta,.empty,.detail-empty { color:var(--sp-copy); }
+      .sync,.secondary,.field,.menu-image-choice { border-color:var(--sp-line); color:var(--sp-ink); background:var(--sp-surface); }
+      .field { color-scheme:dark; }
+      .order-row { border-color:var(--sp-line); color:var(--sp-ink); background:var(--sp-surface); }
+      .order-row.selected { background:#203834; box-shadow:inset 3px 0 0 var(--sp-sea); }
+      .status.new { color:#f0ca78; background:#493b22; }
+      .status.confirmed,.status.ready { color:#a8d6b6; background:#233c30; }
+      .status.preparing { color:#a9d4d5; background:#233b3f; }
+      .status.out { color:#d0b9e5; background:#372c44; }
+      .status.completed { color:#c3d1cd; background:#293631; }
+      .status.cancelled { color:#f0b29d; background:#482e27; }
+      .menu-editor { border-color:var(--sp-line); background:var(--sp-surface-raised); }
+      .menu-editor label,.branch-form label,.info-value,.item { color:var(--sp-ink); }
+      .menu-image-choice.selected { border-color:var(--sp-sea); outline-color:rgba(143,199,194,.22); }
+      .notice { border-color:#ead9ad; color:#111; background:#fbf2dc; }
+      .notice.delivery,.traffic-note { border-color:#d5e4df; color:#111; background:#e9f2ee; }
+      .stat-icon { color:var(--sp-sea); background:#243a35; }
+      .primary { color:#fff; background:#984832; }
+      .primary:hover { background:#aa5d44; }
+      .danger { color:#f0b29d; border-color:#6c4940; }
+      .secondary:hover { border-color:#52665e; background:var(--sp-surface-raised); }
+      .review-rating { color:#edc96e; }
+      .field::placeholder { color:#91a29b; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; }
+    }
+    h1,h2,h3,h4,.brand-name,.panel-head h2,.stat-value,.detail-title h3,.delivery-card h3,.branch-section h3,.login-form h2 { font-family:"Cardo",Georgia,serif; }
+    .site-loader { position:fixed; z-index:1000; inset:0; display:grid; place-content:center; justify-items:center; gap:14px; background:var(--lightning-white); color:var(--hyperblack); opacity:1; visibility:visible; transition:opacity .35s ease,visibility .35s ease; }
+    .site-loader.is-hidden { opacity:0; visibility:hidden; pointer-events:none; }
+    .site-loader img { width:auto; height:78px; max-width:62px; object-fit:contain; animation:logo-rise .7s cubic-bezier(.2,.75,.25,1) both; }
+    .site-loader span { font:700 17px/1 "Cardo",Georgia,serif; letter-spacing:.02em; animation:corporate-rise .65s .08s both; }
+    @keyframes logo-rise { from { opacity:0; transform:translateY(28px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+    @keyframes corporate-rise { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    @media (prefers-reduced-motion:no-preference) {
+      body.motion-ready .reveal-3d { opacity:0; transform:perspective(1000px) translate3d(0,24px,-10px) rotateX(3deg); transform-origin:50% 100%; transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1); }
+      body.motion-ready .reveal-3d.is-visible { opacity:1; transform:perspective(1000px) translate3d(0,0,0) rotateX(0); }
+      .rise-on-load { animation:corporate-rise .78s cubic-bezier(.2,.75,.25,1) both; }
+    }
+    .stat,.panel,.delivery-card { transform-style:preserve-3d; transition:transform .28s ease,box-shadow .28s ease; }
+    .stat:hover,.panel:hover,.delivery-card:hover { transform:perspective(1100px) translateY(-2px) rotateX(.4deg); }
+    @media (prefers-color-scheme:dark) { .site-loader { background:#171615; color:#f7f4ee; } }
+    @media (prefers-reduced-motion:reduce) {
+      .site-loader img,.site-loader span { animation:none!important; }
+      body.motion-ready .reveal-3d { opacity:1!important; transform:none!important; }
+    }
+    .topbar-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .admin-preview-notice { margin:0 0 18px; }
+    @media (max-width:1050px) {
+      .sidebar { grid-template-columns:minmax(150px,.55fr) minmax(0,1.45fr); }
+      .side-nav { justify-content:flex-start; scrollbar-width:none; overscroll-behavior-inline:contain; scroll-snap-type:x proximity; }
+      .side-nav::-webkit-scrollbar { display:none; }
+      .side-nav button { scroll-snap-align:start; }
+    }
+    @media (max-width:700px) {
+      .sidebar { grid-template-columns:1fr; gap:7px; padding:10px 12px 8px; }
+      .brand { grid-row:1; }
+      .side-nav { grid-row:2; grid-column:1; }
+      .side-nav { width:100%; padding:2px 0 4px; }
+      .side-nav button { flex:none; min-height:46px; padding-inline:12px; }
+      .main { padding:20px 13px 35px; }
+      .topbar { display:grid; grid-template-columns:minmax(0,1fr); gap:14px; margin-bottom:18px; }
+      .topbar > div:first-child { min-width:0; }
+      .topbar-actions { display:grid!important; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+      .topbar-actions > button { width:100%; min-width:0; min-height:44px; padding-inline:9px; font-size:12px; }
+      .topbar-actions .sync { grid-column:1 / -1; width:100%; min-width:0; min-height:44px; justify-content:flex-start; margin:0; white-space:normal; }
+      .stats { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+      .stat { min-width:0; min-height:108px; padding:12px; }
+      .stat-top { align-items:center; gap:6px; font-size:9px; }
+      .stat-value { overflow-wrap:anywhere; font-size:24px; }
+      .panel-head { min-height:64px; flex-wrap:wrap; gap:10px; padding:12px 14px; }
+      .panel-head h2 { font-size:17px; }
+      .panel-head > button { min-height:44px; }
+      .filters { display:grid; grid-template-columns:minmax(0,1fr); gap:8px; padding:12px 14px; }
+      .order-row { grid-template-columns:minmax(0,1fr) auto; gap:7px 10px; padding:14px; }
+      .order-row > div:first-child { grid-column:1; grid-row:1; min-width:0; }
+      .order-row > .row-type { grid-column:1; grid-row:2; min-width:0; }
+      .order-row > .order-meta:nth-child(3) { grid-column:1; grid-row:3; min-width:0; overflow-wrap:anywhere; }
+      .order-row > .row-total { grid-column:2; grid-row:1 / span 3; align-self:start; padding-top:2px; font-size:12px; }
+      .order-row .status { max-width:100%; white-space:normal; }
+      .detail { min-width:0; }
+      .detail-body { padding:16px; }
+      .action-row { flex-direction:column; }
+      .action-row > * { width:100%; min-height:44px; }
+      .menu-editor { grid-template-columns:minmax(0,1fr); gap:12px; padding:16px; }
+      .menu-editor .full,.menu-actions { grid-column:auto; }
+      .menu-actions > button { min-height:44px; }
+      .menu-item { grid-template-columns:minmax(0,1fr) auto; gap:10px; }
+      .menu-item-info { min-width:0; }
+      .menu-item-actions { grid-column:2; grid-row:1 / span 2; flex-direction:column; }
+      .menu-item-actions > button { min-width:44px; min-height:44px; }
+      .branch-grid,.branch-days,.delivery-grid { grid-template-columns:minmax(0,1fr); }
+      .revenue-overview { grid-template-columns:minmax(0,1fr); }
+      .revenue-row { grid-template-columns:minmax(0,1fr) auto; gap:8px 12px; }
+      .revenue-track { grid-column:1; grid-row:2; }
+      .revenue-amount { grid-column:2; grid-row:1 / span 2; align-self:center; }
+      .revenue-total-card,.revenue-history { min-width:0; padding:16px; }
+      .branch-grid .full { grid-column:auto; }
+      .day-row { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+      .delivery-card { min-width:0; padding:16px; }
+      .delivery-card-head { flex-direction:column; }
+      .delivery-card-head > div { min-width:0; overflow-wrap:anywhere; }
+      .delivery-actions > button { flex:1 1 100%; min-height:46px; }
+      .toast { right:12px; bottom:12px; left:12px; max-width:none; }
+      .admin-preview-notice { margin-bottom:14px; }
+    }
+    @media (max-width:360px) {
+      .main { padding-inline:10px; }
+      .brand { gap:8px; }
+      .side-nav button { padding-inline:10px; font-size:11px; }
+      .stat { padding:10px; }
+      .stat-icon { width:28px; height:28px; }
+      .revenue-total-value { font-size:28px; }
+    }
   </style>
 </head>
 <body>
+  <div id="site-loader" class="site-loader" role="status" aria-live="polite" aria-label="Loading Swahili Plate">
+    <img src="/brand-assets/20260925_213031_0000.svg?v=20261019" alt="">
+    <span>Swahili Plate</span>
+  </div>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand"><div class="brand-name">Swahili Plate</div><div class="brand-kicker">Operations desk</div></div>
+      <div class="brand"><img class="brand-mark" src="/brand-assets/20260925_213031_0000.svg?v=20261019" alt=""><div><div class="brand-name">Swahili Plate</div><div class="brand-kicker">Operations desk</div></div></div>
       <nav class="side-nav" aria-label="Admin navigation">
         <button id="orders-nav-button" class="active" type="button" onclick="showOrders()"><i data-lucide="layout-dashboard"></i><span>Orders</span></button>
         <button id="menu-nav-button" type="button" onclick="showMenuManagement()"><i data-lucide="utensils"></i><span>Menu</span></button>
         <button id="branch-nav-button" type="button" onclick="showBranchManagement()"><i data-lucide="map-pin"></i><span>Branches</span></button>
         <button id="delivery-nav-button" type="button" onclick="showDeliveryManagement()"><i data-lucide="bike"></i><span>Deliveries</span></button>
         <button id="reviews-nav-button" type="button" onclick="showReviewManagement()"><i data-lucide="star"></i><span>Reviews</span></button>
+        <button id="revenue-nav-button" type="button" onclick="showRevenueManagement()" hidden><i data-lucide="chart-column"></i><span>Total Revenue</span></button>
       </nav>
       <div class="side-foot">A clear view of every plate, table and delivery.</div>
     </aside>
     <main class="main">
       <header class="topbar">
         <div><p class="eyebrow">Swahili Plate / Operations</p><h1 id="page-title">Orders today</h1><p id="page-subtitle" class="subtle">Track the kitchen queue, tables and riders from one place.</p></div>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end"><button id="admin-login-button" class="secondary" type="button" onclick="openAdminLogin()"><i data-lucide="key-round" style="width:15px;vertical-align:-3px"></i> Admin sign in</button><button id="notification-button" class="secondary" type="button" onclick="enableNotifications()"><i data-lucide="bell" style="width:15px;vertical-align:-3px"></i> Enable alerts</button><div class="sync"><span id="sync-dot" class="dot"></span><span id="sync-label">Connecting to orders</span></div></div>
+        <div class="topbar-actions"><button id="admin-login-button" class="secondary" type="button" onclick="openAdminLogin()"><i data-lucide="key-round" style="width:15px;vertical-align:-3px"></i> Admin sign in</button><button id="notification-button" class="secondary" type="button" onclick="enableNotifications()"><i data-lucide="bell" style="width:15px;vertical-align:-3px"></i> Enable alerts</button><div class="sync"><span id="sync-dot" class="dot"></span><span id="sync-label">Connecting to orders</span></div></div>
       </header>
+      <div id="admin-preview-notice" class="notice admin-preview-notice" role="status" hidden>Read-only preview with sample data. Changes will not be saved.</div>
+  <div id="notification-config-status" class="notice" style="margin-bottom:18px" role="status" aria-live="polite" hidden></div>
       <section class="stats" aria-label="Order summary">
         <article class="stat"><div class="stat-top"><span>All orders</span><span class="stat-icon"><i data-lucide="receipt"></i></span></div><div id="stat-all" class="stat-value">0</div></article>
         <article class="stat"><div class="stat-top"><span>Needs action</span><span class="stat-icon" style="color:#b95032;background:#fae4dc"><i data-lucide="bell-ring"></i></span></div><div id="stat-action" class="stat-value">0</div></article>
@@ -160,7 +515,7 @@
       <div id="orders-workspace" class="workspace">
         <section class="panel">
           <div class="panel-head"><h2>Live order queue</h2><button class="secondary" type="button" onclick="loadOrders()"><i data-lucide="refresh-cw" style="width:15px;vertical-align:-3px"></i> Refresh</button></div>
-          <div class="filters"><input id="search" class="field" type="search" placeholder="Search customer, phone or order ID"><select id="status-filter" class="field" aria-label="Filter by status"><option value="all">All statuses</option><option>New</option><option>Confirmed</option><option>Preparing</option><option>Ready</option><option>Out for delivery</option><option>Completed</option><option>Cancelled</option></select><select id="mode-filter" class="field" aria-label="Filter by order mode"><option value="all">All order types</option><option>Dine in</option><option>Delivery</option><option>Take out</option><option>Pick up</option></select></div>
+          <div class="filters"><input id="search" class="field" type="search" aria-label="Search orders" placeholder="Search customer, phone or order ID"><select id="status-filter" class="field" aria-label="Filter by status"><option value="all">All statuses</option><option>New</option><option>Confirmed</option><option>Preparing</option><option>Ready</option><option>Out for delivery</option><option>Completed</option><option>Cancelled</option></select><select id="mode-filter" class="field" aria-label="Filter by order mode"><option value="all">All order types</option><option>Dine in</option><option>Delivery</option><option>Take out</option><option>Pick up</option></select></div>
           <div id="orders" class="orders"><div class="empty">Loading customer orders...</div></div>
         </section>
         <aside id="detail" class="panel detail" aria-live="polite"><div class="detail-empty"><i data-lucide="mouse-pointer-click" style="width:30px;height:30px"></i><p>Select an order to see customer, meal, payment and delivery details.</p></div></aside>
@@ -176,6 +531,9 @@
           <label class="full">Description<input id="menu-description" class="field" required placeholder="Short description shown to customers"></label>
           <label class="full">Variants <span class="menu-item-meta">Optional: Single:200, Double:250</span><input id="menu-variants" class="field" placeholder="Option:price, Option:price"></label>
           <label class="full">Labels <span class="menu-item-meta">Optional: Vegetarian, Contains dairy</span><input id="menu-labels" class="field" placeholder="Label, Label"></label>
+          <details class="full"><summary style="cursor:pointer;font-weight:700">Choose a photo from the asset library</summary><label class="full" style="display:block;margin-top:10px">Filter photos<input id="menu-image-search" class="field" type="search" placeholder="Search filenames"></label><div id="menu-image-library" class="menu-image-library"><div class="menu-image-library-empty">Connect to load the photo library.</div></div></details>
+          <label class="full">Image URL or path <span class="menu-item-meta">You can also paste an HTTPS URL or a /brand-assets/ path. Leave blank for no photo.</span><input id="menu-image" class="field" type="text" autocomplete="off" placeholder="/brand-assets/Swahili%20plate.%20assets/IMG-20261002-WA0012.jpg"></label>
+          <div class="full"><img id="menu-image-preview" class="menu-image-preview" alt="Selected product image preview" hidden></div>
           <div class="menu-actions"><button id="menu-submit" class="primary" type="submit">Add product for new menu items</button><button id="menu-cancel" class="secondary" type="button" onclick="resetMenuForm()" hidden>Cancel edit</button></div>
         </form>
         <div class="filters" style="padding-left:0;padding-right:0"><input id="menu-search" class="field" type="search" placeholder="Search menu items"><select id="menu-filter" class="field" aria-label="Filter menu items"><option value="all">All menu types</option><option value="food">Food</option><option value="drinks">Drinks</option></select></div>
@@ -199,14 +557,18 @@
         <div class="panel-head" style="padding:0 0 16px"><h2>Customer reviews</h2><button class="secondary" type="button" onclick="loadReviews()"><i data-lucide="refresh-cw" style="width:15px;vertical-align:-3px"></i> Refresh reviews</button></div>
         <div id="reviews-list" class="review-list"><div class="empty">Loading customer reviews...</div></div>
       </section>
+      <section id="revenue-panel" class="panel branch-panel" hidden>
+        <div class="panel-head" style="padding:0 0 16px"><div><h2>Total revenue</h2><p id="revenue-period" class="subtle" style="margin:6px 0 0">Completed orders in the last six calendar months.</p></div><button class="secondary" type="button" onclick="loadRevenue()"><i data-lucide="refresh-cw" style="width:15px;vertical-align:-3px"></i> Refresh</button></div>
+        <div id="revenue-content" aria-live="polite"><div class="empty">Loading revenue history...</div></div>
+      </section>
     </main>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <dialog id="admin-login-dialog" aria-labelledby="admin-login-title">
     <form id="admin-login-form" class="login-form">
       <h2 id="admin-login-title">Connect to live orders</h2>
-      <p class="subtle" style="margin:0">Enter the admin access secret configured for the deployed service.</p>
-      <label for="admin-token-input">Admin access secret</label>
+      <p class="subtle" style="margin:0">Enter your admin or master access secret.</p>
+      <label for="admin-token-input">Access secret</label>
       <input id="admin-token-input" class="field" type="password" autocomplete="current-password" required>
       <div class="login-actions"><button class="secondary" type="button" onclick="closeAdminLogin()">Cancel</button><button class="primary" type="submit">Connect</button></div>
     </form>
@@ -214,23 +576,52 @@
 <script>
   const demoOrders = [
     { id:"demo-1048", customer_name:"Amina Hassan", customer_phone:"0712 345 678", customer_email:"amina@example.com", branch:"CBD", ordering_mode:"Delivery", cart_items:JSON.stringify([{name:"Chicken Biryani",price:900,quantity:2},{name:"Iced Dawa",price:280,quantity:1}]), subtotal:2080, service_fee:250, grand_total:2330, special_requests:"Please make the biryani mildly spiced.", delivery_address:"Delta Towers, Wood Avenue", delivery_area:"Kilimani", delivery_landmark:"Next to Yaya Centre", delivery_instructions:"Call on arrival. Reception can direct you to floor 4.", rider_name:"", rider_phone:"", order_status:"New", payment_method:"M-Pesa / payment contact", payment_status:"Payment pending - order submitted", order_timestamp:new Date().toISOString() },
-    { id:"demo-1047", customer_name:"David Otieno", customer_phone:"0770 111 222", customer_email:"david@example.com", branch:"Sarit Centre", ordering_mode:"Dine in", cart_items:JSON.stringify([{name:"Mutton Mandhi",price:1200,quantity:1},{name:"Swahili Tea",price:150,quantity:2}]), subtotal:1500, service_fee:0, grand_total:1500, reservation_date:new Date().toISOString().slice(0,10), reservation_time:"19:30", party_size:3, special_requests:"Birthday table if possible.", delivery_address:"", delivery_area:"", delivery_landmark:"", delivery_instructions:"", rider_name:"", rider_phone:"", order_status:"Confirmed", payment_method:"Pay in person", payment_status:"Reservation submitted - pending confirmation", order_timestamp:new Date(Date.now()-3600000).toISOString() }
+    { id:"demo-1047", customer_name:"David Otieno", customer_phone:"0770 111 222", customer_email:"david@example.com", branch:"Sarit Centre", ordering_mode:"Dine in", cart_items:JSON.stringify([{name:"Mutton Mandhi",price:1200,quantity:1},{name:"Swahili Tea",price:150,quantity:2}]), subtotal:1500, service_fee:0, grand_total:1500, reservation_date:new Date().toISOString().slice(0,10), reservation_time:"19:30", party_size:3, special_requests:"Birthday table if possible.", delivery_address:"", delivery_area:"", delivery_landmark:"", delivery_instructions:"", rider_name:"", rider_phone:"", order_status:"Confirmed", payment_method:"Pay in person", payment_status:"Reservation submitted - pending confirmation", order_timestamp:new Date(Date.now()-3600000).toISOString() },
+    { id:"demo-1049", customer_name:"Njeri Wanjiku", customer_phone:"0722 555 018", customer_email:"njeri@example.com", branch:"CBD", ordering_mode:"Delivery", cart_items:JSON.stringify([{name:"Pilau ya Kuku",price:850,quantity:1},{name:"Mango Juice",price:250,quantity:2}]), subtotal:1350, service_fee:250, grand_total:1600, delivery_address:"Riverside Drive", delivery_area:"Westlands", delivery_landmark:"Near the river entrance", delivery_instructions:"Call when you arrive.", rider_name:"Fatuma Ali", rider_phone:"0712 345 678", delivery_status:"On the way", delivery_traffic:"Traffic", delivery_update:"Traffic near Ngara. ETA is 25 minutes.", order_status:"Out for delivery", payment_method:"M-Pesa", payment_status:"Paid", order_timestamp:new Date(Date.now()-7200000).toISOString() }
   ];
+  const adminPreviewMode = new URLSearchParams(window.location.search).get("preview") === "responsive";
   let orders = [];
+  let adminRole = "admin";
   let selectedId = null;
   let receivedInitialFeed = false;
   let knownOrderIds = new Set();
+  const riderDrafts = new Map();
+  function riderDraftFor(order) {
+    const draft = riderDrafts.get(String(order.id)) || {};
+    const statuses = ["Accepted", "Picked up", "On the way", "Delivered"];
+    const trafficOptions = ["No traffic", "Traffic", "Heavy traffic"];
+    return {
+      rider_name:draft.rider_name ?? order.rider_name ?? "",
+      rider_phone:draft.rider_phone ?? order.rider_phone ?? "",
+      delivery_status:statuses.includes(draft.delivery_status) ? draft.delivery_status : statuses.includes(order.delivery_status) ? order.delivery_status : "Accepted",
+      delivery_traffic:trafficOptions.includes(draft.delivery_traffic) ? draft.delivery_traffic : trafficOptions.includes(order.delivery_traffic) ? order.delivery_traffic : "No traffic",
+      delivery_update:draft.delivery_update ?? order.delivery_update ?? ""
+    };
+  }
+  function updateRiderDraft(orderId, changes) {
+    const key = String(orderId);
+    riderDrafts.set(key, {...(riderDrafts.get(key) || {}), ...changes});
+  }
+  function clearRiderDraft(orderId, fields, savedFields = {}) {
+    const key = String(orderId);
+    const draft = riderDrafts.get(key);
+    if (!draft) return;
+    fields.forEach(field => { if (draft[field] === savedFields[field]) delete draft[field]; });
+    if (!Object.keys(draft).length) riderDrafts.delete(key);
+  }
   const ADMIN_TOKEN_STORAGE_KEY = "swahili-plate-admin-token";
   const MENU_DATA_STORAGE_KEY = "swahili-plate-menu";
   const menuChannel = "BroadcastChannel" in window ? new BroadcastChannel("swahili-plate-menu") : null;
   let menuCatalog = {food:[], drinks:[]};
+  let menuImageLibrary = [];
+  let menuImageLibraryLoaded = false;
   const BRANCH_DATA_STORAGE_KEY = "swahili-plate-branch-settings";
   const branchChannel = "BroadcastChannel" in window ? new BroadcastChannel("swahili-plate-branch-settings") : null;
   const branchDefaults = {
     business:{name:"Swahili Plate",description:"A taste of the Swahili coast, served with warm hospitality.",phone:"0711726448",email:"hello@swahiliplate.com"},
     branches:{
-      "CBD":{address:"Muindi Mbingu Street, opposite Equity Bank.",phone:"0711726448",deliveryMinutes:45,mapUrl:"https://maps.app.goo.gl/GSRCir4nuJ2X2WFeA",images:["https://images.pexels.com/photos/11998535/pexels-photo-11998535.jpeg?auto=compress&cs=tinysrgb&w=800"],hours:{Monday:"08:00-22:00",Tuesday:"08:00-22:00",Wednesday:"08:00-22:00",Thursday:"08:00-22:00",Friday:"08:00-22:00",Saturday:"08:00-22:00",Sunday:"08:00-20:00"}},
-      "Sarit Centre":{address:"Sarit Centre, Parklands / Highridge.",phone:"0773497954",deliveryMinutes:50,mapUrl:"https://maps.app.goo.gl/VsFLp6eGyDj7tTJv6",images:["https://images.pexels.com/photos/18014531/pexels-photo-18014531.jpeg?auto=compress&cs=tinysrgb&w=800"],hours:{Monday:"08:00-22:00",Tuesday:"08:00-22:00",Wednesday:"08:00-22:00",Thursday:"08:00-22:00",Friday:"08:00-22:00",Saturday:"08:00-22:00",Sunday:"08:00-20:00"}}
+      "CBD":{address:"Muindi Mbingu Street, opposite Equity Bank.",phone:"0711726448",deliveryMinutes:45,mapUrl:"https://maps.app.goo.gl/GSRCir4nuJ2X2WFeA",images:["/brand-assets/web-ready/Swahili%20plate.%20assets/take%203.jpg"],hours:{Monday:"08:00-22:00",Tuesday:"08:00-22:00",Wednesday:"08:00-22:00",Thursday:"08:00-22:00",Friday:"08:00-22:00",Saturday:"08:00-22:00",Sunday:"08:00-20:00"}},
+      "Sarit Centre":{address:"Sarit Centre, Parklands / Highridge.",phone:"0773497954",deliveryMinutes:50,mapUrl:"https://maps.app.goo.gl/VsFLp6eGyDj7tTJv6",images:["/brand-assets/web-ready/Swahili%20plate.%20assets/take%204.jpg"],hours:{Monday:"08:00-22:00",Tuesday:"08:00-22:00",Wednesday:"08:00-22:00",Thursday:"08:00-22:00",Friday:"08:00-22:00",Saturday:"08:00-22:00",Sunday:"08:00-20:00"}}
     }
   };
   let branchSettings = branchDefaults;
@@ -240,13 +631,34 @@
   const dateText = value => value ? new Date(value).toLocaleString("en-KE", {dateStyle:"medium", timeStyle:"short"}) : "-";
   const statusClass = value => String(value || "New").toLowerCase().replace(/\s+/g,"-");
   function showToast(message) { const toast = document.getElementById("toast"); toast.textContent = message; toast.classList.add("show"); clearTimeout(showToast.timer); showToast.timer = setTimeout(() => toast.classList.remove("show"), 3500); }
+  function lastNotificationSummary(order) {
+    const channels = order?.notification_history?.at(-1)?.channels;
+    return channels ? Object.entries(channels).map(([name, status]) => `${name}: ${status.replaceAll("_", " ")}`).join(" · ") : "";
+  }
   function validMenuCatalog(menu) { return menu && Array.isArray(menu.food) && Array.isArray(menu.drinks); }
+  function publicAssetPath(value) {
+    if (!value || /^https?:\/\//i.test(value)) return value || "";
+    let decoded = String(value);
+    try { decoded = decodeURIComponent(decoded); } catch { /* Keep malformed legacy paths unchanged. */ }
+    for (const prefix of ["/brand-assets/", "Assets( Swahili plate)/", "/Assets( Swahili plate)/", "customer/Assets( Swahili plate)/"]) {
+      if (decoded.startsWith(prefix)) {
+        let relative = decoded.slice(prefix.length);
+        if (!relative.startsWith("web-ready/")) relative = `web-ready/${relative.replace(/\.(?:jpe?g|png|webp)$/i, ".jpg")}`;
+        return `/brand-assets/${relative.split("/").map(encodeURIComponent).join("/")}`;
+      }
+    }
+    return value;
+  }
+  function normalizeMenuImages(menu) {
+    ["food", "drinks"].forEach(type => menu[type].forEach(item => { if (item.image) item.image = publicAssetPath(item.image); }));
+    return menu;
+  }
   async function readSharedMenu() {
     try {
       const {value} = await apiRequest("/api/settings/menu");
       if (validMenuCatalog(value)) {
-        menuCatalog = value;
-        localStorage.setItem(MENU_DATA_STORAGE_KEY, JSON.stringify(menuCatalog));
+        menuCatalog = normalizeMenuImages(value);
+        if (!adminPreviewMode) localStorage.setItem(MENU_DATA_STORAGE_KEY, JSON.stringify(menuCatalog));
         renderMenuList();
         return;
       }
@@ -254,7 +666,7 @@
     try {
       const cached = JSON.parse(localStorage.getItem(MENU_DATA_STORAGE_KEY) || "null");
       if (validMenuCatalog(cached)) {
-        menuCatalog = cached;
+        menuCatalog = normalizeMenuImages(cached);
         await saveSharedMenu("Menu catalog connected to the shared service.");
       }
     } catch { showToast("The shared menu catalog could not be read."); }
@@ -282,6 +694,44 @@
   }
   function menuVariantsText(item) { return (item.variants || []).map(variant => `${variant.name}:${variant.price}`).join(", "); }
   function menuLabelsText(item) { return (item.labels || []).join(", "); }
+  function updateMenuImagePreview() {
+    const preview = document.getElementById("menu-image-preview");
+    const source = document.getElementById("menu-image").value.trim();
+    if (!source) { preview.removeAttribute("src"); preview.hidden = true; return; }
+    preview.onload = () => { preview.hidden = false; };
+    preview.onerror = () => { preview.hidden = true; };
+    preview.src = source;
+  }
+  function renderMenuImageLibrary() {
+    const gallery = document.getElementById("menu-image-library");
+    if (!gallery) return;
+    const selectedImage = document.getElementById("menu-image").value.trim();
+    const type = document.getElementById("menu-type").value;
+    const query = document.getElementById("menu-image-search").value.trim().toLowerCase();
+    const options = menuImageLibrary.filter(photo => photo.kind === type && (!query || photo.label.toLowerCase().includes(query)));
+    if (!options.length) {
+      gallery.innerHTML = `<div class="menu-image-library-empty">${menuImageLibraryLoaded ? "No matching photos in this category." : "Photo library unavailable. You can still paste an image URL or path below."}</div>`;
+      return;
+    }
+    gallery.innerHTML = options.map(photo => `<button class="menu-image-choice${photo.image === selectedImage ? " selected" : ""}" type="button" data-image-source="${safe(photo.image)}" title="${safe(photo.label)}"><img src="${safe(photo.image)}" alt="${safe(photo.label)}" loading="lazy" onerror="this.parentElement.hidden=true"><span>${safe(photo.label)}</span></button>`).join("");
+    gallery.querySelectorAll("[data-image-source]").forEach(button => button.addEventListener("click", () => setMenuImageSource(button.dataset.imageSource)));
+  }
+  async function loadMenuImageLibrary() {
+    try {
+      const {images} = await apiRequest("/api/menu-images");
+      menuImageLibrary = Array.isArray(images) ? images : [];
+      menuImageLibraryLoaded = true;
+    } catch {
+      menuImageLibrary = [];
+      menuImageLibraryLoaded = false;
+    }
+    renderMenuImageLibrary();
+  }
+  function setMenuImageSource(source) {
+    document.getElementById("menu-image").value = source || "";
+    renderMenuImageLibrary();
+    updateMenuImagePreview();
+  }
   function renderMenuList() {
     const query = document.getElementById("menu-search").value.trim().toLowerCase();
     const typeFilter = document.getElementById("menu-filter").value;
@@ -295,13 +745,15 @@
       });
     });
     if (!rows.length) { holder.innerHTML = '<div class="menu-empty">No menu items found. Add a product above.</div>'; return; }
-    holder.innerHTML = rows.map(({type, index, item}) => `<article class="menu-item"><div><div class="menu-item-name">${safe(item.name)}</div><div class="menu-item-meta">${safe(type)} · ${safe(item.category)}${item.variants?.length ? " · " + safe(menuVariantsText(item)) : ""}</div></div><strong>${money(item.price)}</strong><div class="menu-item-actions"><button class="secondary" type="button" onclick="editMenuItem('${type}',${index})">Edit</button><button class="secondary danger" type="button" onclick="deleteMenuItem('${type}',${index})">Delete</button></div></article>`).join("");
+    holder.innerHTML = rows.map(({type, index, item}) => `<article class="menu-item"><div class="menu-item-info">${item.image ? `<img class="menu-item-thumbnail" src="${safe(publicAssetPath(item.image))}" alt="${safe(item.name)} photo" loading="lazy" onerror="this.hidden=true">` : ""}<div><div class="menu-item-name">${safe(item.name)}</div><div class="menu-item-meta">${safe(type)} · ${safe(item.category)}${item.variants?.length ? " · " + safe(menuVariantsText(item)) : ""}</div></div></div><strong>${money(item.price)}</strong><div class="menu-item-actions"><button class="secondary" type="button" onclick="editMenuItem('${type}',${index})">Edit</button><button class="secondary danger" type="button" onclick="deleteMenuItem('${type}',${index})">Delete</button></div></article>`).join("");
   }
   function resetMenuForm() {
     document.getElementById("menu-form").reset();
     document.getElementById("menu-edit-index").value = "";
     document.getElementById("menu-submit").textContent = "Add product for new menu items";
     document.getElementById("menu-cancel").hidden = true;
+    renderMenuImageLibrary();
+    updateMenuImagePreview();
   }
   function editMenuItem(type, index) {
     const item = menuCatalog[type][index];
@@ -314,6 +766,7 @@
     document.getElementById("menu-description").value = item.description || "";
     document.getElementById("menu-variants").value = menuVariantsText(item);
     document.getElementById("menu-labels").value = menuLabelsText(item);
+    setMenuImageSource(item.image || "");
     document.getElementById("menu-submit").textContent = "Update product for existing items";
     document.getElementById("menu-cancel").hidden = false;
     document.getElementById("menu-category").focus();
@@ -326,12 +779,13 @@
     resetMenuForm();
   }
   async function showMenuManagement() {
-    await readSharedMenu();
+    await Promise.all([readSharedMenu(), loadMenuImageLibrary()]);
     document.querySelector(".stats").hidden = true;
     document.getElementById("orders-workspace").hidden = true;
     document.getElementById("branch-panel").hidden = true;
     document.getElementById("delivery-panel").hidden = true;
     document.getElementById("reviews-panel").hidden = true;
+    document.getElementById("revenue-panel").hidden = true;
     document.getElementById("menu-panel").hidden = false;
     document.getElementById("page-title").textContent = "Menu management";
     document.getElementById("page-subtitle").textContent = "Update products for customers in real time.";
@@ -339,6 +793,7 @@
     document.getElementById("branch-nav-button").classList.remove("active");
     document.getElementById("delivery-nav-button").classList.remove("active");
     document.getElementById("reviews-nav-button").classList.remove("active");
+    document.getElementById("revenue-nav-button").classList.remove("active");
     document.getElementById("orders-nav-button").classList.remove("active");
     renderMenuList();
   }
@@ -349,15 +804,18 @@
     document.getElementById("branch-panel").hidden = true;
     document.getElementById("delivery-panel").hidden = true;
     document.getElementById("reviews-panel").hidden = true;
+    document.getElementById("revenue-panel").hidden = true;
     document.getElementById("page-title").textContent = "Orders today";
     document.getElementById("page-subtitle").textContent = "Track the kitchen queue, tables and riders from one place.";
     document.getElementById("menu-nav-button").classList.remove("active");
     document.getElementById("branch-nav-button").classList.remove("active");
     document.getElementById("delivery-nav-button").classList.remove("active");
     document.getElementById("reviews-nav-button").classList.remove("active");
+    document.getElementById("revenue-nav-button").classList.remove("active");
     document.getElementById("orders-nav-button").classList.add("active");
   }
   async function readBranchSettings() {
+    if (adminPreviewMode) { branchSettings = branchDefaults; return; }
     try {
       const {value} = await apiRequest("/api/settings/branches");
       if (value?.business && value?.branches) {
@@ -377,7 +835,7 @@
     document.getElementById("business-description").value = branchSettings.business.description;
     document.getElementById("business-phone").value = branchSettings.business.phone;
     document.getElementById("business-email").value = branchSettings.business.email;
-    document.getElementById("branch-editors").innerHTML = Object.entries(branchSettings.branches).map(([name, branch]) => `<article class="branch-section"><h3>${safe(name)} branch</h3><div class="branch-grid"><label>Address<input class="field branch-address" data-branch="${safe(name)}" value="${safe(branch.address)}" required></label><label>Branch phone<input class="field branch-phone" data-branch="${safe(name)}" value="${safe(branch.phone)}" required></label><label>Base delivery time (minutes)<input class="field branch-delivery" data-branch="${safe(name)}" type="number" min="0" step="1" value="${Number(branch.deliveryMinutes) || 0}" required></label></div><h4>Working hours</h4><div class="branch-days">${weekDays.map(day => `<label class="day-row"><span>${day}</span><input class="field branch-hours" data-branch="${safe(name)}" data-day="${day}" value="${safe(branch.hours?.[day] || "Closed")}" placeholder="08:00-22:00"></label>`).join("")}</div><h4>Business images</h4><div class="image-list">${(branch.images || []).map((image, index) => `<div class="image-item"><img src="${safe(image)}" alt="${safe(name)} branch image"><button type="button" onclick="deleteBranchImage('${safe(name)}',${index})">Delete image</button></div>`).join("")}</div><div class="branch-grid" style="margin-top:12px"><input id="image-url-${safe(name).replace(/\W/g, "-")}" class="field branch-image-url" data-branch="${safe(name)}" placeholder="Paste image URL to add"><button type="button" class="secondary" onclick="addBranchImage('${safe(name)}')">Add image</button></div></article>`).join("");
+    document.getElementById("branch-editors").innerHTML = Object.entries(branchSettings.branches).map(([name, branch]) => `<article class="branch-section"><h3>${safe(name)} branch</h3><div class="branch-grid"><label>Address<input class="field branch-address" data-branch="${safe(name)}" value="${safe(branch.address)}" required></label><label>Branch phone<input class="field branch-phone" data-branch="${safe(name)}" value="${safe(branch.phone)}" required></label><label>Base delivery time (minutes)<input class="field branch-delivery" data-branch="${safe(name)}" type="number" min="0" step="1" value="${Number(branch.deliveryMinutes) || 0}" required></label></div><h4>Working hours</h4><div class="branch-days">${weekDays.map(day => `<label class="day-row"><span>${day}</span><input class="field branch-hours" data-branch="${safe(name)}" data-day="${day}" value="${safe(branch.hours?.[day] || "Closed")}" placeholder="08:00-22:00"></label>`).join("")}</div><h4>Business images</h4><div class="image-list">${(branch.images || []).map((image, index) => `<div class="image-item"><img src="${safe(publicAssetPath(image))}" alt="${safe(name)} branch image"><button type="button" onclick="deleteBranchImage('${safe(name)}',${index})">Delete image</button></div>`).join("")}</div><div class="branch-grid" style="margin-top:12px"><input id="image-url-${safe(name).replace(/\W/g, "-")}" class="field branch-image-url" data-branch="${safe(name)}" placeholder="Paste image URL to add"><button type="button" class="secondary" onclick="addBranchImage('${safe(name)}')">Add image</button></div></article>`).join("");
   }
   async function saveBranchSettings(message) {
     try {
@@ -410,6 +868,7 @@
     document.getElementById("menu-panel").hidden = true;
     document.getElementById("delivery-panel").hidden = true;
     document.getElementById("reviews-panel").hidden = true;
+    document.getElementById("revenue-panel").hidden = true;
     document.getElementById("branch-panel").hidden = false;
     document.getElementById("page-title").textContent = "Branch management";
     document.getElementById("page-subtitle").textContent = "Keep business information, branch hours and delivery estimates current.";
@@ -417,6 +876,7 @@
     document.getElementById("branch-nav-button").classList.add("active");
     document.getElementById("delivery-nav-button").classList.remove("active");
     document.getElementById("reviews-nav-button").classList.remove("active");
+    document.getElementById("revenue-nav-button").classList.remove("active");
     document.getElementById("orders-nav-button").classList.remove("active");
     renderBranchEditors();
   }
@@ -426,6 +886,7 @@
     document.getElementById("menu-panel").hidden = true;
     document.getElementById("branch-panel").hidden = true;
     document.getElementById("reviews-panel").hidden = true;
+    document.getElementById("revenue-panel").hidden = true;
     document.getElementById("delivery-panel").hidden = false;
     document.getElementById("page-title").textContent = "Deliveries";
     document.getElementById("page-subtitle").textContent = "Accept delivery orders and keep customers informed.";
@@ -433,6 +894,7 @@
     document.getElementById("branch-nav-button").classList.remove("active");
     document.getElementById("delivery-nav-button").classList.add("active");
     document.getElementById("reviews-nav-button").classList.remove("active");
+    document.getElementById("revenue-nav-button").classList.remove("active");
     document.getElementById("orders-nav-button").classList.remove("active");
     renderDeliveries();
   }
@@ -442,12 +904,24 @@
     document.getElementById("menu-panel").hidden = true;
     document.getElementById("branch-panel").hidden = true;
     document.getElementById("delivery-panel").hidden = true;
+    document.getElementById("revenue-panel").hidden = true;
     document.getElementById("reviews-panel").hidden = false;
     document.getElementById("page-title").textContent = "Customer reviews";
     document.getElementById("page-subtitle").textContent = "Read customer feedback from both branches.";
-    ["orders-nav-button", "menu-nav-button", "branch-nav-button", "delivery-nav-button"].forEach(id => document.getElementById(id).classList.remove("active"));
+    ["orders-nav-button", "menu-nav-button", "branch-nav-button", "delivery-nav-button", "revenue-nav-button"].forEach(id => document.getElementById(id).classList.remove("active"));
     document.getElementById("reviews-nav-button").classList.add("active");
     await loadReviews();
+  }
+  async function showRevenueManagement() {
+    if (adminRole !== "master") return showToast("Total revenue is available to the master account.");
+    document.querySelector(".stats").hidden = true;
+    ["orders-workspace", "menu-panel", "branch-panel", "delivery-panel", "reviews-panel"].forEach(id => document.getElementById(id).hidden = true);
+    document.getElementById("revenue-panel").hidden = false;
+    document.getElementById("page-title").textContent = "Total revenue";
+    document.getElementById("page-subtitle").textContent = "Six months of completed sales, saved from the order ledger.";
+    ["orders-nav-button", "menu-nav-button", "branch-nav-button", "delivery-nav-button", "reviews-nav-button"].forEach(id => document.getElementById(id).classList.remove("active"));
+    document.getElementById("revenue-nav-button").classList.add("active");
+    await loadRevenue();
   }
   async function loadReviews() {
     const holder = document.getElementById("reviews-list");
@@ -456,6 +930,24 @@
       holder.innerHTML = reviews.length ? reviews.map(review => `<article class="review-item"><div class="review-head"><div><strong>${safe(review.name)}</strong><div class="order-meta">${safe(review.branch)} · ${safe(dateText(review.submittedAt))}</div></div><span class="review-rating">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span></div><p style="margin:12px 0 0;line-height:1.65">${safe(review.message)}</p></article>`).join("") : '<div class="empty">No customer reviews yet.</div>';
     } catch {
       holder.innerHTML = '<div class="empty">Reviews could not be loaded. Check the admin connection.</div>';
+    }
+  }
+  let loadingRevenue = false;
+  async function loadRevenue() {
+    if (adminRole !== "master" || loadingRevenue) return;
+    loadingRevenue = true;
+    const holder = document.getElementById("revenue-content");
+    try {
+      const summary = await apiRequest("/api/admin/revenue");
+      const months = Array.isArray(summary.months) ? summary.months : [];
+      const maxRevenue = Math.max(0, ...months.map(month => Number(month.revenue) || 0));
+      const periodDate = value => new Date(`${value}T12:00:00`).toLocaleDateString("en-KE", {dateStyle:"medium"});
+      document.getElementById("revenue-period").textContent = `${periodDate(summary.period_start)} – ${periodDate(summary.period_end)} · completed orders`;
+      holder.innerHTML = `<div class="revenue-overview"><article class="revenue-total-card"><div class="revenue-total-label">Total sales · six months</div><div class="revenue-total-value">${money(summary.total_revenue)}</div><p class="subtle" style="margin:10px 0 0">${Number(summary.order_count) || 0} completed orders</p></article><section class="revenue-history" aria-label="Monthly sales history">${months.map(month => { const revenue = Number(month.revenue) || 0; const width = maxRevenue ? Math.max(0, Math.min(100, revenue / maxRevenue * 100)) : 0; return `<div class="revenue-row"><div><div class="revenue-month">${safe(month.label)}</div><div class="order-meta">${Number(month.order_count) || 0} orders</div></div><div class="revenue-track" aria-hidden="true"><div class="revenue-fill" style="width:${width}%"></div></div><div class="revenue-amount">${money(revenue)}</div></div>`; }).join("")}</section></div>`;
+    } catch {
+      holder.innerHTML = '<div class="empty">Revenue could not be loaded. Check the master account connection and try again.</div>';
+    } finally {
+      loadingRevenue = false;
     }
   }
   async function enableNotifications() {
@@ -508,11 +1000,21 @@
     const deliveries = deliveryOrders();
     if (!deliveries.length) { holder.innerHTML = '<div class="empty">No active delivery orders.</div>'; return; }
     holder.innerHTML = deliveries.map(order => {
+      const draft = riderDraftFor(order);
       const accepted = Boolean(order.rider_name);
       const traffic = order.delivery_traffic || "Not reported";
       const status = order.delivery_status || (accepted ? "Accepted" : "Waiting for rider");
-      return `<article class="delivery-card"><div class="delivery-card-head"><div><h3>${safe(order.customer_name || "Guest")}</h3><p class="delivery-card-meta">#${safe(String(order.id).slice(-6).toUpperCase())} · ${safe(order.branch || "Branch")} · ${safe(order.delivery_address || "Address not provided")}</p><p class="delivery-card-meta">${safe(order.delivery_area || "Area not provided")}${order.delivery_landmark ? " · " + safe(order.delivery_landmark) : ""}</p></div><span class="status ${statusClass(order.order_status)}">${safe(status)}</span></div><div class="delivery-grid"><div><div class="info-label">Rider</div><div class="info-value">${safe(order.rider_name || "Not accepted")}</div></div><div><div class="info-label">Traffic</div><div class="info-value">${safe(traffic)}</div></div></div><p class="notice delivery" style="margin:14px 0 0"><strong>Latest update:</strong> ${safe(order.delivery_update || "Waiting for a rider to accept this order.")}</p><div class="delivery-grid"><input id="rider-name-${safe(order.id)}" class="field" placeholder="Rider name" value="${safe(order.rider_name || "")}"><input id="rider-phone-${safe(order.id)}" class="field" placeholder="Rider phone" value="${safe(order.rider_phone || "")}"><select id="delivery-status-${safe(order.id)}" class="field"><option${status === "Accepted" ? " selected" : ""}>Accepted</option><option${status === "Picked up" ? " selected" : ""}>Picked up</option><option${status === "On the way" ? " selected" : ""}>On the way</option><option${status === "Delivered" ? " selected" : ""}>Delivered</option></select><select id="delivery-traffic-${safe(order.id)}" class="field"><option${traffic === "No traffic" ? " selected" : ""}>No traffic</option><option${traffic === "Traffic" ? " selected" : ""}>Traffic</option><option${traffic === "Heavy traffic" ? " selected" : ""}>Heavy traffic</option></select><textarea id="delivery-update-${safe(order.id)}" class="field" rows="2" placeholder="Update for the customer">${safe(order.delivery_update || "")}</textarea></div><div class="delivery-actions"><button class="primary" type="button" onclick="acceptDelivery('${safe(order.id)}')">${accepted ? "Update rider" : "Accept delivery"}</button><button class="secondary" type="button" onclick="postDeliveryUpdate('${safe(order.id)}')">Post delivery update</button></div></article>`;
+      return `<article class="delivery-card" data-order-id="${safe(order.id)}"><div class="delivery-card-head"><div><h3>${safe(order.customer_name || "Guest")}</h3><p class="delivery-card-meta">#${safe(String(order.id).slice(-6).toUpperCase())} · ${safe(order.branch || "Branch")} · ${safe(order.delivery_address || "Address not provided")}</p><p class="delivery-card-meta">${safe(order.delivery_area || "Area not provided")}${order.delivery_landmark ? " · " + safe(order.delivery_landmark) : ""}</p></div><span class="status ${statusClass(order.order_status)}">${safe(status)}</span></div><div class="delivery-grid"><div><div class="info-label">Rider</div><div class="info-value">${safe(order.rider_name || "Not accepted")}</div></div><div><div class="info-label">Traffic</div><div class="info-value">${safe(traffic)}</div></div></div><p class="notice delivery" style="margin:14px 0 0"><strong>Latest update:</strong> ${safe(order.delivery_update || "Waiting for a rider to accept this order.")}</p><div class="delivery-grid"><input id="rider-name-${safe(order.id)}" class="field" placeholder="Rider name" value="${safe(draft.rider_name)}"><input id="rider-phone-${safe(order.id)}" class="field" type="tel" inputmode="tel" autocomplete="tel" placeholder="Rider phone" value="${safe(draft.rider_phone)}"><select id="delivery-status-${safe(order.id)}" class="field"><option${draft.delivery_status === "Accepted" ? " selected" : ""}>Accepted</option><option${draft.delivery_status === "Picked up" ? " selected" : ""}>Picked up</option><option${draft.delivery_status === "On the way" ? " selected" : ""}>On the way</option><option${draft.delivery_status === "Delivered" ? " selected" : ""}>Delivered</option></select><select id="delivery-traffic-${safe(order.id)}" class="field"><option${draft.delivery_traffic === "No traffic" ? " selected" : ""}>No traffic</option><option${draft.delivery_traffic === "Traffic" ? " selected" : ""}>Traffic</option><option${draft.delivery_traffic === "Heavy traffic" ? " selected" : ""}>Heavy traffic</option></select><textarea id="delivery-update-${safe(order.id)}" class="field" rows="2" placeholder="Update for the customer">${safe(draft.delivery_update)}</textarea></div><div class="delivery-actions">
+  <button class="primary" type="button" onclick="acceptDelivery('${safe(order.id)}')">${accepted ? "Update rider" : "Accept & Dispatch"}</button>
+  <button class="secondary" type="button" onclick="postDeliveryUpdate('${safe(order.id)}')">Post update</button>
+  <button class="secondary" type="button" onclick="retryCustomerNotifications('${safe(order.id)}')">Retry customer notifications</button>
+</div></article>`;
     }).join("");
+    holder.querySelectorAll('[id^="rider-name-"]').forEach(input => input.setAttribute("aria-label", "Rider name"));
+    holder.querySelectorAll('[id^="rider-phone-"]').forEach(input => input.setAttribute("aria-label", "Rider phone number"));
+    holder.querySelectorAll('[id^="delivery-status-"]').forEach(input => input.setAttribute("aria-label", "Delivery status"));
+    holder.querySelectorAll('[id^="delivery-traffic-"]').forEach(input => input.setAttribute("aria-label", "Delivery traffic"));
+    holder.querySelectorAll('[id^="delivery-update-"]').forEach(input => input.setAttribute("aria-label", "Update for the customer"));
   }
   function deliveryOrderStatus(status) { return status === "Delivered" ? "Completed" : status === "Accepted" ? "Out for delivery" : "Out for delivery"; }
   async function acceptDelivery(id) {
@@ -521,13 +1023,18 @@
     const riderName = document.getElementById(`rider-name-${id}`).value.trim();
     const riderPhone = document.getElementById(`rider-phone-${id}`).value.trim();
     if (!riderName || !riderPhone) return showToast("Enter the rider name and phone before accepting.");
-    order.rider_name = riderName;
-    order.rider_phone = riderPhone;
-    order.order_status = "Out for delivery";
-    order.delivery_status = "Accepted";
-    order.delivery_update = `${riderName} accepted the delivery.`;
-    order.delivery_update_timestamp = new Date().toISOString();
-    try { await persistOrder(order); showToast("Delivery accepted and customer updated."); renderDeliveries(); } catch { showToast("Could not accept this delivery."); }
+    updateRiderDraft(id, {rider_name:riderName, rider_phone:riderPhone});
+    try {
+      await persistOrder(order, {
+        rider_name:riderName,
+        rider_phone:riderPhone,
+        order_status:"Out for delivery",
+        delivery_status:"Accepted",
+        delivery_update:`${riderName} accepted the delivery.`,
+        delivery_update_timestamp:new Date().toISOString()
+      }, ["rider_name", "rider_phone"]);
+      showToast(`Delivery accepted. ${lastNotificationSummary(order)}`);
+    } catch { showToast("Could not accept this delivery."); }
   }
   async function postDeliveryUpdate(id) {
     const order = orders.find(item => item.id === id);
@@ -535,12 +1042,25 @@
     const deliveryStatus = document.getElementById(`delivery-status-${id}`).value;
     const traffic = document.getElementById(`delivery-traffic-${id}`).value;
     const update = document.getElementById(`delivery-update-${id}`).value.trim();
-    order.delivery_status = deliveryStatus;
-    order.delivery_traffic = traffic;
-    order.delivery_update = update || `${deliveryStatus}. Traffic status: ${traffic}.`;
-    order.delivery_update_timestamp = new Date().toISOString();
-    order.order_status = deliveryOrderStatus(deliveryStatus);
-    try { await persistOrder(order); showToast("Delivery update posted to the customer and admin queue."); renderDeliveries(); } catch { showToast("Could not post this delivery update."); }
+    const customerUpdate = update || `${deliveryStatus}. Traffic status: ${traffic}.`;
+    updateRiderDraft(id, {delivery_status:deliveryStatus, delivery_traffic:traffic, delivery_update:customerUpdate});
+    try {
+      await persistOrder(order, {
+        delivery_status:deliveryStatus,
+        delivery_traffic:traffic,
+        delivery_update:customerUpdate,
+        delivery_update_timestamp:new Date().toISOString(),
+        order_status:deliveryOrderStatus(deliveryStatus)
+      }, ["delivery_status", "delivery_traffic", "delivery_update"]);
+      showToast(`Delivery update saved. ${lastNotificationSummary(order)}`);
+    } catch { showToast("Could not post this delivery update."); }
+  }
+  function applyAdminRole(role, connected = true) {
+    adminRole = role === "master" ? "master" : "admin";
+    const revenueButton = document.getElementById("revenue-nav-button");
+    revenueButton.hidden = adminRole !== "master";
+    if (adminRole !== "master" && !document.getElementById("revenue-panel").hidden) showOrders();
+    document.getElementById("admin-login-button").textContent = connected ? (adminRole === "master" ? "Master account connected" : "Admin connected") : "Admin sign in";
   }
   function selectOrder(id) { selectedId = id; renderOrders(); renderDetail(orders.find(order => order.id === id)); }
   function openAdminLogin() { const dialog = document.getElementById("admin-login-dialog"); if (!dialog.open) dialog.showModal(); document.getElementById("admin-token-input").focus(); }
@@ -549,6 +1069,27 @@
     const headers = new Headers(options.headers || {});
     headers.set("X-Admin-Token", sessionStorage.getItem(ADMIN_TOKEN_STORAGE_KEY) || "");
     if (options.body) headers.set("Content-Type", "application/json");
+    if (adminPreviewMode) {
+      if (String(options.method || "GET").toUpperCase() !== "GET") throw new Error("This read-only preview does not save changes.");
+      if (path === "/api/admin/session") return {role:"master"};
+      if (path === "/api/orders") return demoOrders;
+      if (path === "/api/settings/menu") return {value:{food:[{name:"Chicken Biryani",category:"Coastal favourites",price:900,description:"Fragrant basmati rice with tender chicken.",image:"",variants:[],labels:[]},{name:"Pilau ya Kuku",category:"Coastal favourites",price:850,description:"Slow-cooked pilau with warm coastal spices.",image:"",variants:[],labels:[]}],drinks:[{name:"Iced Dawa",category:"Fresh drinks",price:280,description:"Lime, honey and ginger over ice.",image:"",variants:[],labels:[]}]}};
+      if (path === "/api/settings/branches") return {value:branchDefaults};
+      if (path === "/api/menu-images") return {images:[]};
+      if (path === "/api/notifications/status") return {email_configured:true,whatsapp_configured:true,mpesa_stk_push_configured:true};
+      if (path === "/api/reviews") return [{name:"Mariam K.",branch:"CBD",submittedAt:new Date().toISOString(),rating:5,message:"Warm service and beautifully seasoned food."},{name:"Peter O.",branch:"Sarit Centre",submittedAt:new Date(Date.now()-86400000).toISOString(),rating:4,message:"The pilau was excellent. I will be back."}];
+      if (path === "/api/admin/revenue") {
+        const now = new Date();
+        const values = [112400,139800,105600,162300,148900,187500];
+        const months = values.map((revenue,index) => {
+          const date = new Date(now.getFullYear(),now.getMonth() - (values.length - index - 1),1);
+          return {label:date.toLocaleDateString("en-KE",{month:"short",year:"numeric"}),revenue,order_count:[28,34,26,41,38,50][index]};
+        });
+        const periodStart = new Date(now.getFullYear(),now.getMonth()-5,1);
+        return {period_start:periodStart.toISOString().slice(0,10),period_end:now.toISOString().slice(0,10),total_revenue:months.reduce((sum,month) => sum + month.revenue,0),order_count:217,months};
+      }
+      return {};
+    }
     const response = await fetch(path, {...options, headers});
     let payload = {};
     try { payload = await response.json(); } catch { /* A non-JSON response will be reported by status below. */ }
@@ -557,26 +1098,99 @@
   }
   function renderDetail(order) {
     const holder = document.getElementById("detail");
-    if (!order) { holder.innerHTML = '<div class="detail-empty"><i data-lucide="mouse-pointer-click" style="width:30px;height:30px"></i><p>Select an order to see customer, meal, payment and delivery details.</p></div>'; lucide.createIcons(); return; }
+    if (!order) { delete holder.dataset.orderId; holder.innerHTML = '<div class="detail-empty"><i data-lucide="mouse-pointer-click" style="width:30px;height:30px"></i><p>Select an order to see customer, meal, payment and delivery details.</p></div>'; lucide.createIcons(); return; }
+    holder.dataset.orderId = String(order.id);
+    const riderDraft = riderDraftFor(order);
     const items = parseItems(order);
     const delivery = order.ordering_mode === "Delivery";
-    holder.innerHTML = `<div class="panel-head"><h2>Order details</h2><span class="order-id">#${safe(String(order.id).slice(-6).toUpperCase())}</span></div><div class="detail-body"><div class="detail-title"><div><h3>${safe(order.customer_name || "Guest")}</h3><p class="subtle" style="margin:5px 0 0">${safe(dateText(order.order_timestamp))}</p></div><span class="status ${statusClass(order.order_status)}">${safe(order.order_status || "New")}</span></div><div class="detail-section"><h4>Update order</h4><div class="action-grid"><div class="action-row"><select id="detail-status" class="field"><option>New</option><option>Confirmed</option><option>Preparing</option><option>Ready</option><option>Out for delivery</option><option>Completed</option><option>Cancelled</option></select><button class="primary" type="button" onclick="updateStatus()">Save</button></div><div class="action-row"><input id="rider-name" class="field" placeholder="Rider name" value="${safe(order.rider_name)}"><input id="rider-phone" class="field" placeholder="Rider phone" value="${safe(order.rider_phone)}"></div><button class="secondary" type="button" onclick="assignRider()"><i data-lucide="bike" style="width:15px;vertical-align:-3px"></i> Save rider assignment</button></div></div><div class="detail-section"><h4>Customer</h4><div class="info-grid"><div><div class="info-label">Phone</div><div class="info-value"><a href="tel:${safe(order.customer_phone)}">${safe(order.customer_phone || "-")}</a></div></div><div><div class="info-label">Email</div><div class="info-value">${safe(order.customer_email || "-")}</div></div><div><div class="info-label">Branch</div><div class="info-value">${safe(order.branch || "-")}</div></div><div><div class="info-label">Order type</div><div class="info-value">${safe(order.ordering_mode || "-")}</div></div></div></div><div class="detail-section"><h4>Items</h4><div class="items">${items.length ? items.map(item => `<div class="item"><span>${safe(item.quantity || 1)} × ${safe(item.name)}</span><span>${money(Number(item.price || 0) * Number(item.quantity || 1))}</span></div>`).join("") : "<span class='subtle'>No item list attached.</span>"}</div><div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)" class="items"><div class="item"><span>Subtotal</span><span>${money(order.subtotal)}</span></div><div class="item"><span>Service / packing fee</span><span>${money(order.service_fee)}</span></div><div class="item" style="font-size:15px"><strong>Grand total</strong><strong>${money(order.grand_total)}</strong></div></div></div>${delivery ? `<div class="detail-section"><h4>Delivery route</h4><div class="notice delivery"><strong>${safe(order.delivery_address || "Address not provided")}</strong><br>${safe(order.delivery_area || "Area not provided")}${order.delivery_landmark ? " · " + safe(order.delivery_landmark) : ""}<br><span style="display:block;margin-top:8px">${safe(order.delivery_instructions || "No rider instructions added.")}</span></div><div class="info-grid" style="margin-top:12px"><div><div class="info-label">Rider</div><div class="info-value">${safe(order.rider_name || "Unassigned")}</div></div><div><div class="info-label">Rider phone</div><div class="info-value">${safe(order.rider_phone || "-")}</div></div></div></div>` : `<div class="detail-section"><h4>Dining details</h4><div class="notice"><strong>${safe(order.ordering_mode || "Order")}</strong>${order.reservation_date ? `<br>${safe(order.reservation_date)} at ${safe(order.reservation_time || "time pending")} · party of ${safe(order.party_size || "-")}` : ""}</div></div>`}<div class="detail-section"><h4>Requests & payment</h4><div class="notice">${order.special_requests ? `<strong>Special request:</strong> ${safe(order.special_requests)}<br><br>` : "No special requests."}<strong>Payment:</strong> ${safe(order.payment_method || "-")}<br><strong>Status:</strong> ${safe(order.payment_status || "Pending")}</div></div></div>`;
-    document.getElementById("detail-status").value = order.order_status || "New"; lucide.createIcons();
+    holder.innerHTML = `<div class="panel-head"><h2>Order details</h2><span class="order-id">#${safe(String(order.id).slice(-6).toUpperCase())}</span></div><div class="detail-body"><div class="detail-title"><div><h3>${safe(order.customer_name || "Guest")}</h3><p class="subtle" style="margin:5px 0 0">${safe(dateText(order.order_timestamp))}</p></div><span class="status ${statusClass(order.order_status)}">${safe(order.order_status || "New")}</span></div><div class="detail-section"><h4>Update order</h4><div class="action-grid">
+  <div class="action-row">
+    <select id="detail-status" class="field">
+      <option>New</option>
+      <option>Confirmed</option>
+      <option>Preparing</option>
+      <option>Ready</option>
+      <option>Out for delivery</option>
+      <option>Completed</option>
+      <option>Cancelled</option>
+    </select>
+    <button class="primary" type="button" onclick="updateStatus()">Update status</button>
+  </div>
+  ${delivery ? `<div class="action-row">
+    <input id="rider-name" class="field" placeholder="Rider name (e.g. John Kamau)" value="${safe(riderDraft.rider_name)}">
+    <input id="rider-phone" class="field" type="tel" inputmode="tel" autocomplete="tel" placeholder="Rider phone (e.g. 0712345678)" value="${safe(riderDraft.rider_phone)}">
+  </div>
+  <button class="primary" type="button" onclick="assignRider()">
+    <i data-lucide="bike" style="width:15px;vertical-align:-3px"></i> Assign rider & dispatch
+  </button>` : ""}
+  <div style="margin-top:6px;padding-top:8px;border-top:1px dashed var(--line)">
+    <div class="info-label" style="margin-bottom:6px">Customer notifications</div>
+    <p class="subtle" style="margin:0 0 8px;font-size:12px">Email and opted-in WhatsApp alerts are sent automatically when the order is received and when its status changes.</p>
+    <button class="secondary" type="button" onclick="retryCustomerNotifications('${safe(order.id)}')">Retry latest notification</button>
+  </div>
+</div></div><div class="detail-section"><h4>Customer</h4><div class="info-grid"><div><div class="info-label">Phone</div><div class="info-value"><a href="tel:${safe(order.customer_phone)}">${safe(order.customer_phone || "-")}</a></div></div><div><div class="info-label">Email</div><div class="info-value">${safe(order.customer_email || "-")}</div></div><div><div class="info-label">Branch</div><div class="info-value">${safe(order.branch || "-")}</div></div><div><div class="info-label">Order type</div><div class="info-value">${safe(order.ordering_mode || "-")}</div></div></div></div><div class="detail-section"><h4>Items</h4><div class="items">${items.length ? items.map(item => `<div class="item"><span>${safe(item.quantity || 1)} × ${safe(item.name)}</span><span>${money(Number(item.price || 0) * Number(item.quantity || 1))}</span></div>`).join("") : "<span class='subtle'>No item list attached.</span>"}</div><div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)" class="items"><div class="item"><span>Subtotal</span><span>${money(order.subtotal)}</span></div><div class="item"><span>Service / packing fee</span><span>${money(order.service_fee)}</span></div><div class="item" style="font-size:15px"><strong>Grand total</strong><strong>${money(order.grand_total)}</strong></div></div></div>${delivery ? `<div class="detail-section"><h4>Delivery route</h4><div class="notice delivery"><strong>${safe(order.delivery_address || "Address not provided")}</strong><br>${safe(order.delivery_area || "Area not provided")}${order.delivery_landmark ? " · " + safe(order.delivery_landmark) : ""}<br><span style="display:block;margin-top:8px">${safe(order.delivery_instructions || "No rider instructions added.")}</span></div><div class="info-grid" style="margin-top:12px"><div><div class="info-label">Rider</div><div class="info-value">${safe(order.rider_name || "Unassigned")}</div></div><div><div class="info-label">Rider phone</div><div class="info-value">${safe(order.rider_phone || "-")}</div></div></div></div>` : `<div class="detail-section"><h4>Dining details</h4><div class="notice"><strong>${safe(order.ordering_mode || "Order")}</strong>${order.reservation_date ? `<br>${safe(order.reservation_date)} at ${safe(order.reservation_time || "time pending")} · party of ${safe(order.party_size || "-")}` : ""}</div></div>`}<div class="detail-section"><h4>Requests & payment</h4><div class="notice">${order.special_requests ? `<strong>Special request:</strong> ${safe(order.special_requests)}<br><br>` : "No special requests."}<strong>Payment:</strong> ${safe(order.payment_method || "-")}<br><strong>Status:</strong> ${safe(order.payment_status || "Pending")}</div></div></div>`;
+    document.getElementById("detail-status").value = order.order_status || "New";
+    document.getElementById("detail-status").setAttribute("aria-label", "Order status");
+    if (delivery) {
+      document.getElementById("rider-name").setAttribute("aria-label", "Rider name");
+      document.getElementById("rider-phone").setAttribute("aria-label", "Rider phone number");
+    }
+    lucide.createIcons();
   }
-  async function persistOrder(order) {
-    const fields = Object.fromEntries(["order_status", "rider_name", "rider_phone", "delivery_status", "delivery_traffic", "delivery_update", "delivery_update_timestamp"].filter(key => key in order).map(key => [key, order[key]]));
+  async function persistOrder(order, fields, clearDraftFields = []) {
     const updated = await apiRequest(`/api/orders/${encodeURIComponent(order.id)}`, {method:"PATCH", body:JSON.stringify(fields)});
     Object.assign(order, updated);
-    renderStats(); renderOrders(); renderDetail(order); renderDeliveries();
+    const currentOrder = orders.find(item => item.id === order.id);
+    if (currentOrder && currentOrder !== order) Object.assign(currentOrder, updated);
+    clearRiderDraft(order.id, clearDraftFields, fields);
+    renderStats(); renderOrders(); renderDetail(orders.find(item => item.id === selectedId)); renderDeliveries();
+    if (adminRole === "master" && !document.getElementById("revenue-panel").hidden) loadRevenue();
   }
-  async function updateStatus() { const order = orders.find(item => item.id === selectedId); if (!order) return; order.order_status = document.getElementById("detail-status").value; try { await persistOrder(order); showToast("Order status updated."); } catch { showToast("Could not update this order."); } }
-  async function assignRider() { const order = orders.find(item => item.id === selectedId); if (!order) return; order.rider_name = document.getElementById("rider-name").value.trim(); order.rider_phone = document.getElementById("rider-phone").value.trim(); try { await persistOrder(order); showToast(order.rider_name ? "Rider assignment saved." : "Rider assignment cleared."); } catch { showToast("Could not save the rider assignment."); } }
+  async function updateStatus() { const order = orders.find(item => item.id === selectedId); if (!order) return; try { await persistOrder(order, {order_status:document.getElementById("detail-status").value}); showToast(`Order status updated. ${lastNotificationSummary(order)}`); } catch { showToast("Could not update this order."); } }
+  async function assignRider() {
+    const order = orders.find(item => item.id === selectedId);
+    if (!order) return;
+    if (order.ordering_mode !== "Delivery") return showToast("Riders can only be assigned to delivery orders.");
+    const name = document.getElementById("rider-name").value.trim();
+    const phone = document.getElementById("rider-phone").value.trim();
+    if (!name || !phone) {
+      showToast("Please enter both the rider's name and phone number.");
+      return;
+    }
+    updateRiderDraft(order.id, {rider_name:name, rider_phone:phone});
+    try {
+      await persistOrder(order, {
+        rider_name:name,
+        rider_phone:phone,
+        order_status:"Out for delivery",
+        delivery_status:"Accepted",
+        delivery_update:`Order dispatched with rider ${name} (${phone}). On the way to you!`,
+        delivery_update_timestamp:new Date().toISOString()
+      }, ["rider_name", "rider_phone"]);
+      showToast(`Rider ${name} assigned and customer updated. ${lastNotificationSummary(order)}`);
+    } catch {
+      showToast("Could not save the rider assignment.");
+    }
+  }
+
+  async function retryCustomerNotifications(orderId) {
+    const order = orders.find(item => item.id === orderId);
+    if (!order) return;
+    try {
+      const result = await apiRequest(`/api/orders/${encodeURIComponent(order.id)}/notify`, {method:"POST"});
+      await loadOrders();
+      const statuses = Object.entries(result.results || {}).map(([channel, status]) => `${channel}: ${status.replaceAll("_", " ")}`).join(" ? ");
+      showToast(`Notification retry complete. ${statuses || "No channel result."}`);
+    } catch {
+      showToast("Could not retry customer notifications.");
+    }
+  }
   function mapRecord(record) { const order = {...record}; order.id = record.__backendId || record.id || "order-" + Math.random().toString(36).slice(2); order.__sdkRecord = record; return order; }
   let loadingOrders = false;
   async function loadOrders() {
     const dot = document.getElementById("sync-dot"); const label = document.getElementById("sync-label");
     if (loadingOrders) return;
-    if (!sessionStorage.getItem(ADMIN_TOKEN_STORAGE_KEY)) { label.textContent = "Admin sign-in required"; dot.classList.remove("live"); return; }
+    if (!adminPreviewMode && !sessionStorage.getItem(ADMIN_TOKEN_STORAGE_KEY)) { label.textContent = "Admin sign-in required"; dot.classList.remove("live"); return; }
     loadingOrders = true;
     try {
       const nextOrders = (await apiRequest("/api/orders")).map(mapRecord);
@@ -585,15 +1199,17 @@
       knownOrderIds = new Set(nextOrders.map(order => order.id));
       if (receivedInitialFeed) announceNewOrders(newOrders);
       receivedInitialFeed = true;
-      dot.classList.add("live"); label.textContent = "Live order feed";
-      document.getElementById("admin-login-button").textContent = "Admin connected";
+      dot.classList.add("live"); label.textContent = adminPreviewMode ? "Sample preview data" : "Live order feed";
+      document.getElementById("admin-login-button").textContent = adminRole === "master" ? "Master account connected" : "Admin connected";
       renderStats(); renderOrders(); renderDeliveries();
       if (selectedId) renderDetail(orders.find(order => order.id === selectedId));
       else if (orders.length) selectOrder(orders[0].id);
+      if (adminRole === "master" && !document.getElementById("revenue-panel").hidden) loadRevenue();
     } catch (error) {
       dot.classList.remove("live");
       if (error.status === 401) {
         sessionStorage.removeItem(ADMIN_TOKEN_STORAGE_KEY);
+        applyAdminRole("admin", false);
         label.textContent = "Admin sign-in required";
         openAdminLogin();
       } else {
@@ -606,17 +1222,35 @@
   async function loadSharedSettings() {
     await Promise.all([readSharedMenu(), readBranchSettings()]);
   }
+  async function loadNotificationStatus() {
+    const holder = document.getElementById("notification-config-status");
+    try {
+      const status = await apiRequest("/api/notifications/status");
+      const setup = [];
+      if (!status.email_configured) setup.push("<li><strong>Email:</strong> SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD, SMTP_FROM_EMAIL</li>");
+      if (!status.whatsapp_configured) setup.push("<li><strong>WhatsApp:</strong> TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, TWILIO_WHATSAPP_CONTENT_SID</li>");
+      if (!status.mpesa_stk_push_configured) setup.push("<li><strong>M-Pesa STK Push:</strong> MPESA_ENV, MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET, MPESA_SHORTCODE, MPESA_PASSKEY, MPESA_TRANSACTION_TYPE, MPESA_CALLBACK_TOKEN, PUBLIC_BASE_URL</li>");
+      holder.hidden = setup.length === 0;
+      if (setup.length) holder.innerHTML = `<strong>Some automatic services are not configured.</strong><br>Add the listed settings to the server environment, then restart the app. Orders and status changes are still saved.<ul style="margin:8px 0 0;padding-left:20px">${setup.join("")}</ul>`;
+    } catch {
+      holder.hidden = true;
+    }
+  }
   document.getElementById("admin-login-form").addEventListener("submit", async event => {
     event.preventDefault();
     sessionStorage.setItem(ADMIN_TOKEN_STORAGE_KEY, document.getElementById("admin-token-input").value);
-    await loadOrders();
-    if (document.getElementById("sync-label").textContent === "Live order feed") {
-      await loadSharedSettings();
+    try {
+      const session = await apiRequest("/api/admin/session");
+      applyAdminRole(session.role);
+      await Promise.all([loadOrders(), loadSharedSettings(), loadNotificationStatus()]);
+      if (document.getElementById("sync-label").textContent !== "Live order feed") throw new Error("Admin order feed is unavailable");
+      if (adminRole === "master") loadRevenue();
       closeAdminLogin();
       document.getElementById("admin-token-input").value = "";
-      document.getElementById("admin-login-button").textContent = "Admin connected";
-    } else {
-      showToast("Could not connect. Check the secret and service status.");
+    } catch {
+      sessionStorage.removeItem(ADMIN_TOKEN_STORAGE_KEY);
+      applyAdminRole("admin", false);
+      showToast("Could not connect. Check the access secret and service status.");
     }
   });
   menuChannel?.addEventListener("message", event => { if (event.data?.type === "menu_updated" && validMenuCatalog(event.data.menu)) { menuCatalog = event.data.menu; renderMenuList(); } });
@@ -634,12 +1268,14 @@
     let variants;
     try { variants = parseMenuVariants(document.getElementById("menu-variants").value); } catch (error) { return showToast(error.message); }
     const labels = document.getElementById("menu-labels").value.split(",").map(label => label.trim()).filter(Boolean);
+    const image = document.getElementById("menu-image").value.trim();
     const item = {
       category:document.getElementById("menu-category").value.trim(),
       name:document.getElementById("menu-name").value.trim(),
       originalName:document.getElementById("menu-name").value.trim(),
       price,
       description:document.getElementById("menu-description").value.trim(),
+      ...(image ? {image} : {}),
       ...(variants.length ? {variants} : {}),
       ...(labels.length ? {labels} : {})
     };
@@ -647,6 +1283,10 @@
       const [oldType, oldIndex] = editValue.split(":");
       const oldItem = menuCatalog[oldType][Number(oldIndex)];
       item.originalName = oldItem?.originalName || item.originalName;
+      if (image && oldItem?.image === image) {
+        if (oldItem.imageConfidence) item.imageConfidence = oldItem.imageConfidence;
+        if (oldItem.imageNote) item.imageNote = oldItem.imageNote;
+      }
       if (oldType === type) menuCatalog[type][Number(oldIndex)] = item;
       else { menuCatalog[oldType].splice(Number(oldIndex), 1); menuCatalog[type].push(item); }
       saveSharedMenu(`${item.name} was updated. Customers can see the change now.`);
@@ -655,6 +1295,12 @@
       saveSharedMenu(`${item.name} was added to the customer menu.`);
     }
     resetMenuForm();
+  });
+  document.getElementById("menu-type").addEventListener("change", renderMenuImageLibrary);
+  document.getElementById("menu-image-search").addEventListener("input", renderMenuImageLibrary);
+  document.getElementById("menu-image").addEventListener("input", () => {
+    renderMenuImageLibrary();
+    updateMenuImagePreview();
   });
   document.getElementById("menu-search").addEventListener("input", renderMenuList);
   document.getElementById("menu-filter").addEventListener("change", renderMenuList);
@@ -675,6 +1321,30 @@
     });
     saveBranchSettings("Business and branch information updated for customers.");
   });
+  const detailPanel = document.getElementById("detail");
+  detailPanel.addEventListener("input", event => {
+    const field = event.target;
+    if (field.id !== "rider-name" && field.id !== "rider-phone") return;
+    const orderId = detailPanel.dataset.orderId;
+    if (!orderId) return;
+    updateRiderDraft(orderId, {[field.id === "rider-name" ? "rider_name" : "rider_phone"]:field.value});
+  });
+  const deliveryList = document.getElementById("delivery-list");
+  const captureDeliveryDraft = event => {
+    const field = event.target;
+    const card = field.closest(".delivery-card[data-order-id]");
+    if (!card) return;
+    const mapping = [
+      ["rider-name-", "rider_name"],
+      ["rider-phone-", "rider_phone"],
+      ["delivery-status-", "delivery_status"],
+      ["delivery-traffic-", "delivery_traffic"],
+      ["delivery-update-", "delivery_update"]
+    ].find(([prefix]) => field.id.startsWith(prefix));
+    if (mapping) updateRiderDraft(card.dataset.orderId, {[mapping[1]]:field.value});
+  };
+  deliveryList.addEventListener("input", captureDeliveryDraft);
+  deliveryList.addEventListener("change", captureDeliveryDraft);
   branchChannel?.addEventListener("message", event => { if (event.data?.type === "branch_settings_updated") { branchSettings = event.data.settings; if (!document.getElementById("branch-panel").hidden) renderBranchEditors(); } });
   window.addEventListener("storage", event => {
     if (event.key === BRANCH_DATA_STORAGE_KEY && event.newValue) {
@@ -683,8 +1353,87 @@
   });
   document.getElementById("search").addEventListener("input", renderOrders); document.getElementById("status-filter").addEventListener("change", renderOrders); document.getElementById("mode-filter").addEventListener("change", renderOrders);
   lucide.createIcons();
-  if (sessionStorage.getItem(ADMIN_TOKEN_STORAGE_KEY)) loadOrders().then(loadSharedSettings); else openAdminLogin();
-  setInterval(loadOrders, 7000);
+  async function restoreAdminSession() {
+    if (adminPreviewMode) {
+      document.body.classList.add("admin-preview-mode");
+      document.getElementById("admin-preview-notice").hidden = false;
+      document.getElementById("admin-login-button").hidden = true;
+      document.getElementById("notification-button").hidden = true;
+      applyAdminRole("master", false);
+      await Promise.all([loadOrders(), loadSharedSettings(), loadNotificationStatus()]);
+      loadRevenue();
+      return;
+    }
+    if (!sessionStorage.getItem(ADMIN_TOKEN_STORAGE_KEY)) { openAdminLogin(); return; }
+    try {
+      const session = await apiRequest("/api/admin/session");
+      applyAdminRole(session.role);
+      await Promise.all([loadOrders(), loadSharedSettings(), loadNotificationStatus()]);
+      if (adminRole === "master") loadRevenue();
+    } catch {
+      sessionStorage.removeItem(ADMIN_TOKEN_STORAGE_KEY);
+      applyAdminRole("admin", false);
+      openAdminLogin();
+    }
+  }
+  restoreAdminSession();
+  if (!adminPreviewMode) setInterval(loadOrders, 7000);
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("/admin/service-worker.js", {scope:"/admin/"}));
+  }
+</script>
+<script>
+  (() => {
+    const loader = document.getElementById("site-loader");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const loadingStartedAt = performance.now();
+    let finished = false;
+    const finishLoading = () => {
+      if (finished || !loader) return;
+      finished = true;
+      const dismiss = () => {
+        loader.setAttribute("aria-hidden", "true");
+        loader.classList.add("is-hidden");
+        window.setTimeout(() => {
+          loader.remove();
+          document.querySelector("#page-title")?.classList.add("rise-on-load");
+        }, 420);
+      };
+      window.setTimeout(dismiss, Math.max(0, (reducedMotion ? 0 : 760) - (performance.now() - loadingStartedAt)));
+    };
+    if (reducedMotion || document.readyState === "complete") finishLoading();
+    else window.addEventListener("load", finishLoading, { once:true });
+    window.setTimeout(finishLoading, 2600);
+
+    const selector = "#page-title, .stats > .stat, .main .panel, .main .detail, .main .delivery-card, .branch-section, .menu-item";
+    if (!reducedMotion && "IntersectionObserver" in window) {
+      document.body.classList.add("motion-ready");
+      const revealObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        });
+      }, { threshold:.12, rootMargin:"0px 0px -5% 0px" });
+      const observeTargets = root => {
+        if (root.matches?.(selector) && !root.classList.contains("reveal-3d")) {
+          root.classList.add("reveal-3d");
+          revealObserver.observe(root);
+        }
+        root.querySelectorAll?.(selector).forEach(target => {
+          if (target.classList.contains("reveal-3d")) return;
+          target.classList.add("reveal-3d");
+          revealObserver.observe(target);
+        });
+      };
+      observeTargets(document);
+      new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => {
+        if (node.nodeType === Node.ELEMENT_NODE) observeTargets(node);
+      }))).observe(document.body, { childList:true, subtree:true });
+    }
+  })();
 </script>
 </body>
 </html>

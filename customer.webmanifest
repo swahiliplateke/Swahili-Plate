@@ -1,0 +1,33 @@
+{
+  "id": "/customer/",
+  "name": "Swahili Plate",
+  "short_name": "Swahili Plate",
+  "description": "Order Swahili coastal food, make a reservation, and follow your delivery.",
+  "start_url": "/customer/",
+  "scope": "/customer/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#d12635",
+  "categories": ["food", "shopping"],
+  "icons": [
+    {
+      "src": "/brand-assets/customer-app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand-assets/customer-app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/brand-assets/customer-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

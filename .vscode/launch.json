@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Customer Site (Local Server)",
+            "url": "http://localhost:8000/customer/",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Admin Site (Local Server)",
+            "url": "http://localhost:8000/admin/",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open Customer Site (Direct File)",
+            "file": "${workspaceFolder}\\Customer Site.html"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open Admin Site (Direct File)",
+            "file": "${workspaceFolder}\\admin.html"
+        }
+    ]
+}
