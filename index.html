@@ -2960,18 +2960,7 @@ summary{display:list-item}blockquote,dl,dd,h1,h2,h3,h4,h5,h6,hr,figure,p,pre{mar
         loader.classList.add("is-hidden");
         document.querySelector("#home > .coast-pattern h1")?.classList.add("rise-on-load");
       };
-      // Let visitors in if a background asset or font never finishes loading.
-      const safetyTimeout = window.setTimeout(revealPage, 5000);
-      const revealAfterFonts = () => {
-        window.clearTimeout(safetyTimeout);
-        revealPage();
-      };
-      const finishLoading = () => {
-        if (!loader || loader.dataset.ready === "true") return;
-        Promise.resolve(document.fonts?.ready).then(revealAfterFonts, revealAfterFonts);
-      };
-      if (document.readyState === "complete") finishLoading();
-      else window.addEventListener("load", finishLoading, { once:true });
+      window.setTimeout(revealPage, 5000);
 
       const selector = "#home > .coast-pattern h1, #home > section, .menu-card, #branch-cards article, #food .canva-banner, #drinks .canva-banner, #cart form, #dine form, #branches > div > .bg-white, .canva-footer";
       if (!reducedMotion && "IntersectionObserver" in window) {
