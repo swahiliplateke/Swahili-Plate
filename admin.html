@@ -3,13 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (() => {
+      const firstPathSegment = window.location.pathname.split("/").filter(Boolean)[0] || "";
+      const isGitHubProject = window.location.hostname.endsWith(".github.io") && Boolean(firstPathSegment);
+      const projectBase = isGitHubProject ? `/${firstPathSegment}/` : "/";
+      window.SWAHILI_PLATE_IS_GITHUB_PROJECT = isGitHubProject;
+      window.SWAHILI_PLATE_PROJECT_BASE = projectBase;
+      if (window.location.protocol !== "file:") {
+        const base = document.createElement("base");
+        base.href = projectBase;
+        document.head.append(base);
+      }
+    })();
+  </script>
   <title>Swahili Plate | Orders</title>
   <meta name="theme-color" content="#123c4a">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Swahili Plate Admin">
   <link rel="manifest" href="/admin/manifest.webmanifest">
-  <link rel="apple-touch-icon" href="/brand-assets/admin-app-icon-192.png">
+  <link rel="apple-touch-icon" href="Assets(%20Swahili%20plate)/admin-app-icon-192.png">
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Alata&family=Cardo:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -223,6 +237,9 @@
     .order-id { color:var(--sp-rust); font-size:11px; letter-spacing:.06em; }
     .customer { color:var(--sp-ink); }
     .order-meta { color:var(--sp-copy); font-size:11px; line-height:1.45; }
+    .order-age { margin-top:4px; color:var(--sp-copy); font-size:11px; font-weight:700; line-height:1.35; }
+    .order-age.new { color:#8b5c00; }
+    .order-age.overdue { color:#a52b22; }
     .status { min-height:26px; padding:5px 10px; font-size:10px; letter-spacing:.01em; }
     .status.new { color:#78521b; background:#f8edcf; }
     .status.confirmed,.status.ready { color:#285d45; background:#e4f0e8; }
@@ -483,12 +500,12 @@
 </head>
 <body>
   <div id="site-loader" class="site-loader" role="status" aria-live="polite" aria-label="Loading Swahili Plate">
-    <img src="/brand-assets/20260925_213031_0000.svg?v=20261019" alt="">
+    <img src="Assets(%20Swahili%20plate)/20260925_213031_0000.svg?v=20261019" alt="">
     <span>Swahili Plate</span>
   </div>
   <div class="shell">
     <aside class="sidebar">
-      <div class="brand"><img class="brand-mark" src="/brand-assets/20260925_213031_0000.svg?v=20261019" alt=""><div><div class="brand-name">Swahili Plate</div><div class="brand-kicker">Operations desk</div></div></div>
+      <div class="brand"><img class="brand-mark" src="Assets(%20Swahili%20plate)/20260925_213031_0000.svg?v=20261019" alt=""><div><div class="brand-name">Swahili Plate</div><div class="brand-kicker">Operations desk</div></div></div>
       <nav class="side-nav" aria-label="Admin navigation">
         <button id="orders-nav-button" class="active" type="button" onclick="showOrders()"><i data-lucide="layout-dashboard"></i><span>Orders</span></button>
         <button id="menu-nav-button" type="button" onclick="showMenuManagement()"><i data-lucide="utensils"></i><span>Menu</span></button>
@@ -509,7 +526,7 @@
       <section class="stats" aria-label="Order summary">
         <article class="stat"><div class="stat-top"><span>All orders</span><span class="stat-icon"><i data-lucide="receipt"></i></span></div><div id="stat-all" class="stat-value">0</div></article>
         <article class="stat"><div class="stat-top"><span>Needs action</span><span class="stat-icon" style="color:#b95032;background:#fae4dc"><i data-lucide="bell-ring"></i></span></div><div id="stat-action" class="stat-value">0</div></article>
-        <article class="stat"><div class="stat-top"><span>Deliveries</span><span class="stat-icon"><i data-lucide="bike"></i></span></div><div id="stat-delivery" class="stat-value">0</div></article>
+        <article class="stat"><div class="stat-top"><span>Active deliveries</span><span class="stat-icon"><i data-lucide="bike"></i></span></div><div id="stat-delivery" class="stat-value">0</div></article>
         <article class="stat"><div class="stat-top"><span>Sales value</span><span class="stat-icon" style="color:#b95032;background:#fff0d8"><i data-lucide="coins"></i></span></div><div id="stat-sales" class="stat-value">KES 0</div></article>
       </section>
       <div id="orders-workspace" class="workspace">
@@ -644,7 +661,10 @@
       if (decoded.startsWith(prefix)) {
         let relative = decoded.slice(prefix.length);
         if (!relative.startsWith("web-ready/")) relative = `web-ready/${relative.replace(/\.(?:jpe?g|png|webp)$/i, ".jpg")}`;
-        return `/brand-assets/${relative.split("/").map(encodeURIComponent).join("/")}`;
+        const assetRoot = window.SWAHILI_PLATE_IS_GITHUB_PROJECT
+          ? `${window.SWAHILI_PLATE_PROJECT_BASE}Assets(%20Swahili%20plate)/`
+          : "/brand-assets/";
+        return `${assetRoot}${relative.split("/").map(encodeURIComponent).join("/")}`;
       }
     }
     return value;
@@ -974,20 +994,49 @@
       return (!query || haystack.includes(query)) && (status === "all" || order.order_status === status) && (mode === "all" || order.ordering_mode === mode);
     });
   }
+  const ORDER_QUEUE_PRIORITY = {New:0, Confirmed:1, Preparing:2, Ready:3, "Out for delivery":4, Completed:5, Cancelled:6};
+  function orderTimestampMs(order) {
+    const timestamp = Date.parse(order.order_timestamp || "");
+    return Number.isFinite(timestamp) ? timestamp : Number.NaN;
+  }
+  function orderAgeLabel(order, now = Date.now()) {
+    const timestamp = orderTimestampMs(order);
+    if (!Number.isFinite(timestamp)) return "Time unavailable";
+    const minutes = Math.floor(Math.max(0, now - timestamp) / 60000);
+    if (minutes < 1) return "Just now";
+    const age = minutes < 60 ? `${minutes}m` : minutes < 1440 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m` : `${Math.floor(minutes / 1440)}d ${Math.floor(minutes % 1440 / 60)}h`;
+    return order.order_status === "New" ? `${age} waiting` : `${age} ago`;
+  }
   function renderStats() {
     document.getElementById("stat-all").textContent = orders.length;
-    document.getElementById("stat-action").textContent = orders.filter(order => ["New","Preparing","Ready"].includes(order.order_status)).length;
-    document.getElementById("stat-delivery").textContent = orders.filter(order => order.ordering_mode === "Delivery").length;
+    document.getElementById("stat-action").textContent = orders.filter(order => ["New","Confirmed","Preparing","Ready"].includes(order.order_status)).length;
+    document.getElementById("stat-delivery").textContent = orders.filter(order => order.ordering_mode === "Delivery" && !["Completed","Cancelled"].includes(order.order_status)).length;
     document.getElementById("stat-sales").textContent = money(orders.reduce((sum, order) => sum + Number(order.grand_total || 0), 0));
   }
   function renderOrders() {
-    const visible = filteredOrders();
+    const visible = filteredOrders().sort((left, right) => {
+      const priority = (ORDER_QUEUE_PRIORITY[left.order_status] ?? 4) - (ORDER_QUEUE_PRIORITY[right.order_status] ?? 4);
+      if (priority) return priority;
+      const leftTime = orderTimestampMs(left);
+      const rightTime = orderTimestampMs(right);
+      if (!Number.isFinite(leftTime)) return Number.isFinite(rightTime) ? 1 : 0;
+      if (!Number.isFinite(rightTime)) return -1;
+      return leftTime - rightTime;
+    });
     const holder = document.getElementById("orders");
-    if (!visible.length) { holder.innerHTML = '<div class="empty">No orders match these filters.</div>'; return; }
+    if (!visible.length) {
+      const hasFilters = document.getElementById("search").value.trim() || document.getElementById("status-filter").value !== "all" || document.getElementById("mode-filter").value !== "all";
+      holder.innerHTML = `<div class="empty">${hasFilters ? "No orders match these filters." : "No orders yet. New orders will appear here."}</div>`;
+      return;
+    }
     holder.innerHTML = visible.map(order => {
       const items = parseItems(order);
       const itemCount = items.reduce((sum,item) => sum + Number(item.quantity || 1), 0);
-      return `<button type="button" class="order-row ${selectedId === order.id ? "selected" : ""}" onclick="selectOrder('${safe(order.id)}')"><div><div class="order-id">#${safe(String(order.id).slice(-6).toUpperCase())}</div><div class="customer">${safe(order.customer_name || "Guest")}</div><div class="order-meta">${safe(dateText(order.order_timestamp))}</div></div><div class="row-type"><span class="status ${statusClass(order.order_status)}">${safe(order.order_status || "New")}</span><div class="order-meta">${safe(order.ordering_mode || "Order")}${order.branch ? " · " + safe(order.branch) : ""}</div></div><div class="order-meta">${itemCount} item${itemCount === 1 ? "" : "s"}</div><div class="row-total">${money(order.grand_total)}</div></button>`;
+      const age = orderAgeLabel(order);
+      const timestamp = orderTimestampMs(order);
+      const overdue = order.order_status === "New" && Number.isFinite(timestamp) && Date.now() - timestamp >= 900000;
+      const ageClass = order.order_status === "New" ? `new${overdue ? " overdue" : ""}` : "";
+      return `<button type="button" class="order-row ${selectedId === order.id ? "selected" : ""}" onclick="selectOrder('${safe(order.id)}')"><div><div class="order-id">#${safe(String(order.id).slice(-6).toUpperCase())}</div><div class="customer">${safe(order.customer_name || "Guest")}</div><div class="order-age ${ageClass}" title="Placed ${safe(dateText(order.order_timestamp))}">${safe(age)}</div></div><div class="row-type"><span class="status ${statusClass(order.order_status)}">${safe(order.order_status || "New")}</span><div class="order-meta">${safe(order.ordering_mode || "Order")}${order.branch ? " · " + safe(order.branch) : ""}</div></div><div class="order-meta">${itemCount} item${itemCount === 1 ? "" : "s"}</div><div class="row-total">${money(order.grand_total)}</div></button>`;
     }).join("");
     renderDeliveries();
   }
@@ -1388,24 +1437,18 @@
   (() => {
     const loader = document.getElementById("site-loader");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const loadingStartedAt = performance.now();
-    let finished = false;
     const finishLoading = () => {
-      if (finished || !loader) return;
-      finished = true;
-      const dismiss = () => {
+      if (!loader || loader.dataset.ready === "true") return;
+      const revealPage = () => {
+        loader.dataset.ready = "true";
         loader.setAttribute("aria-hidden", "true");
         loader.classList.add("is-hidden");
-        window.setTimeout(() => {
-          loader.remove();
-          document.querySelector("#page-title")?.classList.add("rise-on-load");
-        }, 420);
+        document.querySelector("#page-title")?.classList.add("rise-on-load");
       };
-      window.setTimeout(dismiss, Math.max(0, (reducedMotion ? 0 : 760) - (performance.now() - loadingStartedAt)));
+      Promise.resolve(document.fonts?.ready).then(revealPage, revealPage);
     };
-    if (reducedMotion || document.readyState === "complete") finishLoading();
+    if (document.readyState === "complete") finishLoading();
     else window.addEventListener("load", finishLoading, { once:true });
-    window.setTimeout(finishLoading, 2600);
 
     const selector = "#page-title, .stats > .stat, .main .panel, .main .detail, .main .delivery-card, .branch-section, .menu-item";
     if (!reducedMotion && "IntersectionObserver" in window) {
